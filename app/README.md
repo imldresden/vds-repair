@@ -1,5 +1,3 @@
-Visual Decision Support Tool extract from the source code of pmc-vis  
-
 Requirements: 
 - NodeJS v. 20+: `https://nodejs.org/en/download/package-manager`
 

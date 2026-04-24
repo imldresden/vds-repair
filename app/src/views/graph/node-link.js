@@ -1537,67 +1537,6 @@ function unmark(cy, selection) {
   }
 }
 
-async function importCy(cy) {
-  await Swal.fire({
-    title: 'Import Model to Pane',
-    html: `
-        <p> Select .json file to import to the Graph View </p>
-        <label style="float:left;margin-bottom:10px" for="prism-model">Choose a model file:</label>
-        <div class="ui file input">
-            <input id="import-graph" type="file" accept=".json" multiple>
-        </div>
-        `,
-    focusConfirm: false,
-    confirmButtonText: 'Import',
-    confirmButtonColor: 'green',
-
-    preConfirm: () => {
-      const input = document.getElementById('import-graph');
-      if (input.value) {
-        const file = input.files[0];
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          // const backup = {
-          //   nodes: Array.from(cy.elementMapper.nodes.values()),
-          //   edges: Array.from(cy.elementMapper.edges.values()),
-          //   info: info,
-          // };
-
-          const data = {
-            nodes: [],
-            edges: [],
-            info: info,
-            cyImport: JSON.parse(e.target.result),
-          };
-
-          let vars = {};
-          if (cy.vars) {
-            const varsValues = {};
-            Object.keys(cy.vars).forEach((k) => {
-              if (cy.vars[k].avoidInClone) {
-                return;
-              }
-              varsValues[k] = {
-                value: cy.vars[k].value,
-              };
-            });
-            vars = structuredClone(varsValues);
-          }
-          cy = spawnGraph(
-            getPanes()[cy.paneId],
-            data,
-            structuredClone(cy.params),
-            vars,
-          );
-          setPane(cy.paneId, { make: true, force: true }); // reset sidebar to new content
-          dispatchEvent(events.GLOBAL_PROPAGATE);
-        };
-        reader.readAsText(file);
-      }
-    },
-  });
-}
-
 async function exportCyList(cyList) {
   if (cyList && cyList.length > 0) {
     var jsonDataList = [];

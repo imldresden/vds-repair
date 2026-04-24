@@ -1098,42 +1098,12 @@ document
   .getElementById('new-project')
   ?.addEventListener('click', async () => {
     let redirectName;
-    
+
     await Swal.fire({
       title: 'Create new project',
       html: `
         <div style="text-align: left;">
-          <p style="margin-bottom: 15px; font-weight: bold;">Select project mode:</p>
-          <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 25px;">
-            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-              <input type="radio" name="project-mode" value="prism" checked onchange="updateFileInputs()">
-              <span>PRISM Model Checker</span>
-            </label>
-            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-              <input type="radio" name="project-mode" value="dl-repair" onchange="updateFileInputs()">
-              <span>DL Repair Mode</span>
-            </label>
-          </div>
-
-          <div class="ui divider"></div>
-
-          <div id="prism-inputs" style="display: block;">
-            <p style="margin-bottom: 10px;">If creation is successful, you will be redirected.</p>
-            
-            <label style="float:left;margin-bottom:10px;margin-top:15px" for="prism-model">Choose a model file:</label>
-            <div class="ui file input">
-              <input id="prism-model" type="file" accept=".prism, .mdp, .pm">
-            </div>
-
-            <div class="ui divider"></div>
-
-            <label style="float:left;margin-bottom:10px;margin-top:15px" for="prism-props">Choose a properties file:</label>
-            <div class="ui file input">
-              <input id="prism-props" type="file" accept=".props">
-            </div>
-          </div>
-
-          <div id="dl-repair-inputs" style="display: none;">
+          <div id="dl-repair-inputs" style="display: block;">
             <p style="margin-bottom: 10px;">Upload the required files for DL repair analysis.</p>
             
             <label style="float:left;margin-bottom:10px;margin-top:15px" for="ontology-file">Choose ontology file:</label>
@@ -1167,77 +1137,43 @@ document
       focusConfirm: false,
       confirmButtonText: 'Create',
       confirmButtonColor: 'green',
-      didOpen: () => {
-        window.updateFileInputs = () => {
-          const mode = document.querySelector('input[name="project-mode"]:checked').value;
-          document.getElementById('prism-inputs').style.display = mode === 'prism' ? 'block' : 'none';
-          document.getElementById('dl-repair-inputs').style.display = mode === 'dl-repair' ? 'block' : 'none';
-        };
-      },
       preConfirm: () => {
         Swal.showLoading();
         const selectedMode = document.querySelector('input[name="project-mode"]:checked').value;
         const nameInput = document.getElementById('project-name-unified');
-        
-        if (selectedMode === 'prism') {
-          const modelInput = document.getElementById('prism-model');
-          const propsInput = document.getElementById('prism-props');
-          
-          if (!modelInput.value || !propsInput.value) {
-            Swal.hideLoading();
-            Swal.showValidationMessage('Please select both model and properties files');
-            return;
-          }
-          
-          const formData = new FormData();
-          formData.append('model_file', modelInput.files[0], modelInput.value);
-          formData.append('property_file', propsInput.files[0], propsInput.value);
-          
-          const projectName = nameInput.value || shortid.generate();
-          redirectName = projectName;
-          
-          return fetch(
-            `${BACKEND}/${projectName}/create-project`,
-            {
-              method: 'POST',
-              body: formData,
-            },
-          );
-        } else {
-          const ontologyInput = document.getElementById('ontology-file');
-          const interestedAxiomsInput = document.getElementById('interested-axioms-file');
-          const defectInput = document.getElementById('defect-file');
-          
-          if (!ontologyInput.value || !interestedAxiomsInput.value || !defectInput.value) {
-            Swal.hideLoading();
-            Swal.showValidationMessage('Please select all three required files');
-            return;
-          }
-          
-          const formData = new FormData();
-          formData.append('ontology_file', ontologyInput.files[0], ontologyInput.value);
-          formData.append('interested_axioms_file', interestedAxiomsInput.files[0], interestedAxiomsInput.value);
-          formData.append('defect_file', defectInput.files[0], defectInput.value);
-          
-          const projectName = nameInput.value || shortid.generate();
-          redirectName = projectName;
-          
-          return fetch(
-            `${BACKEND}/${projectName}/create-dl-repair-project`,
-            {
-              method: 'POST',
-              body: formData,
-            },
-          );
+
+        const ontologyInput = document.getElementById('ontology-file');
+        const interestedAxiomsInput = document.getElementById('interested-axioms-file');
+        const defectInput = document.getElementById('defect-file');
+
+        if (!ontologyInput.value || !interestedAxiomsInput.value || !defectInput.value) {
+          Swal.hideLoading();
+          Swal.showValidationMessage('Please select all three required files');
+          return;
         }
+
+        const formData = new FormData();
+        formData.append('ontology_file', ontologyInput.files[0], ontologyInput.value);
+        formData.append('interested_axioms_file', interestedAxiomsInput.files[0], interestedAxiomsInput.value);
+        formData.append('defect_file', defectInput.files[0], defectInput.value);
+
+        const projectName = nameInput.value || shortid.generate();
+        redirectName = projectName;
+
+        return fetch(
+          `${BACKEND}/${projectName}/create-dl-repair-project`,
+          {
+            method: 'POST',
+            body: formData,
+          },
+        );
       },
     }).then((response) => {
       if (response.value) {
         if (response.value.status === 200) {
-          const selectedMode = document.querySelector('input[name="project-mode"]:checked')?.value || 'prism';
           Swal.fire({
             title: 'Success!',
-            html: `Redirecting to the created ${selectedMode === 'prism' ? 'PRISM' : 'DL Repair'} project on a new tab.`,
+            html: 'Redirecting to the created DL Repair project on a new tab.',
             timer: 2000,
             timerProgressBar: true,
           }).then(() => {

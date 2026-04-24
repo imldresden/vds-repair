@@ -63,7 +63,7 @@ const stylesheet = [
   {
     selector: 'node.s.marked',
     style: {
-      'background-image': '/src/lib/style/icons/badge-green.svg',
+      'background-image': '/src/style/icons/badge-green.svg',
       'background-image-containment': 'over',
       'background-clip': 'none',
       'bounds-expansion': '11',

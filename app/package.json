@@ -1,7 +1,7 @@
 {
-    "name": "pmc-vis",
+    "name": "vds-repair",
     "version": "0.0.1",
-    "description": "visual analysis tool for probabilistic models",
+    "description": "visual decision support for interactive repairs in DL",
     "type": "module",
     "scripts": {
         "dev": "vite --port 3000",

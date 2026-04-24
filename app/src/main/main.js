@@ -14,7 +14,6 @@ import {
 } from '../views/matrix/matrix-view.js';
 
 let BACKEND = import.meta.env.VITE_BACKEND_RESTFUL;
-let PROJECT_TYPE = 'prism';
 
 // Throttle resize observer using requestAnimationFrame to avoid excessive calls
 const info = {
@@ -231,5 +230,5 @@ document.addEventListener('keydown', (e) => {
 startDLRepairProject();
 
 export {
-  info, setInfo, BACKEND, PROJECT_TYPE,
+  info, setInfo, BACKEND,
 };

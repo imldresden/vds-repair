@@ -2254,16 +2254,6 @@ function ctxmenu(cy) {
         hasTrailingDivider: true,
       },
       {
-        id: 'import-pane',
-        content: 'Import Graph',
-        tooltipText: 'import graph',
-        coreAsWell: true,
-        onClickFunction: () => {
-          importCy(cy);
-        },
-        hasTrailingDivider: false,
-      },
-      {
         id: 'export-pane',
         content: 'Export Graph',
         tooltipText: 'export graph',
@@ -2600,7 +2590,6 @@ function setPublicVars(cy, preset) {
   };
 
   cy.fns = {
-    import: importCy,
     export: exportCy,
     mark: mark,
     'undo-mark': unmark,
@@ -2629,6 +2618,5 @@ export {
   mergePane,
   handleMergePane,
   duplicatePane,
-  importCy,
   exportCy,
 };

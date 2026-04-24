@@ -1287,17 +1287,6 @@ function createRenderer(pane) {
       },
       { divider: true },
       {
-        label: 'Import Graph',
-        action: () => {
-          import('../graph/node-link.js').then(module => {
-            if (module.importCy) {
-              module.importCy(cy);
-            }
-          });
-          hideContextMenu();
-        },
-      },
-      {
         label: 'Export Graph',
         action: () => {
           import('../graph/node-link.js').then(module => {

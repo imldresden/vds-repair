@@ -37,8 +37,8 @@ function getDlRepairHostElements() {
   return {
     container: document.getElementById('container'),
     layout: document.getElementById('dl-repair-layout'),
-    leftPaneHost: document.getElementById('dl-repair-left-pane'),
-    summaryHost: document.getElementById('dl-repair-summary-pane'),
+    leftPaneHost: document.getElementById('dl-repair-summary-pane'),
+    summaryHost: document.getElementById('dl-repair-left-pane'),
     starHost: document.getElementById('dl-repair-star-pane'),
     classHierarchyHost: document.getElementById('dl-repair-class-hierarchy-pane'),
   };

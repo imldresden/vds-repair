@@ -345,19 +345,6 @@ function spawnPane({ spawner, id, newPanePosition }, nodesIds, spawnerNodes) {
   }
 
   enableDragBars();
-  const numberOfPanes = document.getElementById('numberOfPanes');
-
-  if (paneKeysAfter.length > numberOfPanes.value) {
-    destroyPanes(
-      panes[paneKeysAfter[1]].id, // skip the first pane
-      {
-        firstOnly: true,
-        pre: true,
-      },
-    ).catch(error => {
-      console.error('Error destroying panes:', error);
-    });
-  }
 
   // trigger graph comparison update if enabled
   const checkbox = document.getElementById('checkbox-graph-comparison');

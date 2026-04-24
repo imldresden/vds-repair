@@ -71,12 +71,6 @@ function setInfo(newInfo) {
   });
 }
 
-const ww = window.innerWidth;
-const numberOfPanes = document.getElementById('numberOfPanes');
-if (ww && numberOfPanes) {
-  numberOfPanes.value = Math.floor(ww / 200);
-}
-
 if (import.meta.env.VITE_HIDE_TODOS !== 'true') {
   document.querySelectorAll('.to-do').forEach((el) => el.classList.remove('to-do'));
 }

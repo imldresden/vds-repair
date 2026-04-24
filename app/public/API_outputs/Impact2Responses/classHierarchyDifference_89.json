@@ -1,0 +1,10 @@
+{
+  "hierarchyDifference" : {
+    "removedEdges" : [ [ "ERDoctor", "Anasthesiologist" ] ],
+    "addedEdges" : [ ]
+  },
+  "initialHierarchy" : [ [ "Areas", "PsychiatricWard" ], [ "Staff", "Janitor" ], [ "⊤", "Receptionist" ], [ "Staff", "Doctor" ], [ "OnCall", "ERNurse" ], [ "Staff", "Nurse" ], [ "ERDoctor", "Anasthesiologist" ], [ "⊤", "Areas" ], [ "⊤", "Staff" ], [ "ERDoctor", "Surgeon" ], [ "⊤", "Patient" ], [ "Patient", "PsychiatricPatient" ], [ "Areas", "OperatingRoom" ], [ "Areas", "EmergencyRoom" ], [ "⊤", "OnCall" ], [ "OnCall", "Resident" ], [ "MedicalFields", "Surgery" ], [ "Patient", "EmergencyPatient" ], [ "MedicalFields", "Psychology" ], [ "Patient", "SurgicalPatient" ], [ "Nurse", "ERNurse" ], [ "⊤", "MedicalFields" ], [ "MedicalFields", "InternalMedicine" ], [ "Doctor", "Physician" ], [ "Doctor", "Surgeon" ], [ "Areas", "SurgicalWard" ], [ "OnCall", "ERDoctor" ], [ "Doctor", "Psychiatrist" ], [ "Doctor", "Anasthesiologist" ], [ "MedicalFields", "Anasthesiology" ] ],
+  "repairYes" : true,
+  "modifiedHierarchy" : [ [ "Areas", "PsychiatricWard" ], [ "Staff", "Janitor" ], [ "⊤", "Receptionist" ], [ "Staff", "Doctor" ], [ "OnCall", "ERNurse" ], [ "Staff", "Nurse" ], [ "⊤", "Areas" ], [ "⊤", "Staff" ], [ "ERDoctor", "Surgeon" ], [ "⊤", "Patient" ], [ "Patient", "PsychiatricPatient" ], [ "Areas", "OperatingRoom" ], [ "Areas", "EmergencyRoom" ], [ "⊤", "OnCall" ], [ "OnCall", "Resident" ], [ "MedicalFields", "Surgery" ], [ "Patient", "EmergencyPatient" ], [ "MedicalFields", "Psychology" ], [ "Patient", "SurgicalPatient" ], [ "Nurse", "ERNurse" ], [ "⊤", "MedicalFields" ], [ "MedicalFields", "InternalMedicine" ], [ "Doctor", "Physician" ], [ "Doctor", "Surgeon" ], [ "Areas", "SurgicalWard" ], [ "OnCall", "ERDoctor" ], [ "Doctor", "Psychiatrist" ], [ "Doctor", "Anasthesiologist" ], [ "MedicalFields", "Anasthesiology" ] ],
+  "repairNo" : true
+}

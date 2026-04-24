@@ -1,0 +1,479 @@
+@import 'normalize.css/normalize.css';
+@import 'fomantic-ui-css/semantic.min.css';
+@import '@fortawesome/fontawesome-free/css/all.min.css';
+
+:root {
+  --config-width: 350px;
+  --config-closed-width: 5px;
+  --overview-config-closed-width: 60px;
+  --nav-height: 35px;
+}
+
+.minimap {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+}
+
+body {
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--body-bg-color);
+
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;  
+
+  ::-webkit-scrollbar-thumb {
+    border-radius: 0px !important;
+  }
+}
+
+/* Ensure global popups are always above view overlays (e.g. matrix mode uses z-index: 9999). */
+.swal2-container {
+  z-index: 20000 !important;
+}
+
+::-moz-scrollbar-button,
+::-webkit-scrollbar-button {
+  width: 0px;
+}
+
+/* Sidebar */
+#container {
+  display: flex;
+  width: calc(100% - var(--config-width));
+  transition: width .5s;
+  overflow: hidden;
+  border-right: 1px solid black;
+
+  * {
+    min-width: 0;
+  }
+}
+
+#container, svg text {
+  font-family: monospace, monospace !important;
+}
+
+body.config-closed #container {
+  width: calc(100% - var(--config-closed-width));
+  transition: width .5s;
+}
+
+.config {
+  position: fixed;
+  right: 0;
+  top: var(--nav-height);
+  bottom: 0;
+  background: var(--dragbar);
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 1;
+  width: var(--config-width);
+  transition: width .5s;
+  background: var(--pane-background);
+
+  select,
+  .button {
+    font-size: 12px;
+    width: 100%;
+  }
+
+  .ui.checkbox {
+    display: block;
+  }
+
+  #json {
+    max-height: 500px; 
+    overflow-y:auto; 
+    font-size: 10px;
+  }
+}
+
+a {
+  color: var(--dark-text-color);
+}
+
+a:hover {
+  color: var(--dark-text-color);
+}
+
+.button-icon {
+  margin-right: 8px;
+}
+
+nav {
+  a:hover {
+    color: var(--dark-text-color);
+    background-color: var(--config-icon-color-active);
+  }
+}
+
+#config-toggle {
+  position: absolute;
+  z-index: 5;
+  top: calc(var(--nav-height) + 56px);
+  cursor: pointer;
+
+  background-color: var(--pane-background);
+  right: calc(var(--config-width));
+  border-left: 1px solid black;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  transition: right .5s;
+
+  i {
+    position: relative;
+    right: calc(50% - 12px);
+  }
+}
+
+#config-toggle.icon-inactive {
+  right: var(--config-closed-width);
+  transition: right .5s;
+}
+
+#config-resizer {
+  position: fixed;
+  top: var(--nav-height);
+  bottom: 0;
+  right: var(--config-width);
+  width: 8px;
+  margin-right: -4px;
+  cursor: ew-resize;
+  z-index: 4;
+}
+
+#config-resizer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: transparent;
+}
+
+#config-resizer:hover::after {
+  background: var(--config-icon-color-active);
+}
+
+.config-closed #config-resizer {
+  display: none;
+}
+
+body.config-resizing #container,
+body.config-resizing .config,
+body.config-resizing #config-toggle {
+  transition: none;
+}
+
+.config-closed .config {
+  width: var(--config-closed-width);
+  transition: width .5s;
+
+  * {
+    display: none;
+  }
+}
+
+/* End Sidebar */
+.param {
+  margin-top: 1.5em;
+}
+
+.button.param {
+  margin: 1em 0 1em 0 !important;
+}
+
+.param button {
+  width: 3em;
+  margin-right: 0.25em;
+  text-align: center;
+}
+
+.label.inline {
+  display: inline;
+}
+
+.slider {
+  display: block;
+  width: 100%;
+  margin: 0;
+  margin-right: 5px;
+}
+
+.tip-link {
+  display: block;
+}
+
+/* atomic propositions css */
+.cy-html {
+  display: flex;
+  color: var(--ap-text-color);
+}
+
+.cy-html,
+.tippy-tooltip,
+.prop-text {
+  font-size: 12px;
+}
+
+.trigger-check-prop {
+  z-index: 4;
+  cursor: pointer;
+}
+
+summary>.trigger-check-prop {
+  margin-top: 3px;
+}
+
+.trigger-check-prop:hover {
+  color: rgb(94, 94, 94);
+}
+
+.cy-html p {
+  margin: 0;
+}
+
+.inverted-text {
+  color: var(--dark-text-color);
+}
+
+.legend {
+  color: #000;
+  background-color: var(--pane-background);
+}
+
+.legend-node {
+  border-radius: 0%;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  height: 12px;
+  width: 12px;
+  margin-right: 5px;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+.legend-edge {
+  border-radius: 0%;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  width: 12px;
+  margin-right: 5px;
+  display: inline-block;
+}
+
+.legend-p {
+  margin: 0 !important;
+}
+
+#selected-pane {
+  text-decoration: underline;
+  text-decoration-color: var(--active-pane);
+}
+
+.states-selected {
+  border: double 3px;
+  border-color: var(--pcp-primary)
+}
+
+.states-selected {
+  border: none;
+  border-radius: 50%;
+  background-color: var(--pcp-primary)
+}
+
+.actions {
+  background-color: var(--action-color);
+  border-radius: 50%;
+  margin-top: 6px;
+  margin-left: 3px;
+  margin-right: 8px;
+  height: 6px;
+  width: 6px;
+}
+
+.actions-selected {
+  border: none;
+  border-radius: 50%;
+  background-color: var(--pcp-secondary)
+}
+
+.visited {
+  border: solid 3px;
+  background-color: var(--pane-background);
+  border-color: var(--state-color);
+}
+
+.unvisited {
+  background-color: var(--state-color);
+}
+
+.chosen-edge {
+  border: none;
+  background-color: var(--action-color);
+  height: 2px;
+  margin-bottom: 6px;
+  margin-top: 9px;
+}
+
+.not-chosen-edge {
+  border: none;
+  border-bottom: 3px dotted var(--action-color);
+  height: 5px;
+  margin-bottom: 5px;
+  margin-top: 7px;
+}
+
+.prop-text {
+  margin-left: 15px;
+  font-size: 10px !important;
+  padding-bottom: 5px;
+}
+
+.prop-text-label-icon {
+  padding-right: 7px;
+}
+
+.prop-text>.prop-text-label-text {
+  padding-top: 2px;
+}
+
+.prop-text-label-text {
+  padding-left: 7px;
+}
+
+.ui p {
+  margin: 0 !important;
+}
+
+details.title p {
+  margin-left: 10px;
+}
+
+details>.content {
+  padding-top: 0 !important;
+  padding-bottom: 10px !important;
+}
+
+details {
+  border-bottom: solid 0.5px #e6e6e6;
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 5px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+  margin-top: 8px;
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  background: #292929;
+  cursor: pointer;
+  border-radius: 50%;
+
+}
+
+.slider::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  background: #292929;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+select.dropdown {
+  height: 25px;
+  border: 1px solid rgba(34, 36, 38, .15);
+}
+
+a:hover {
+  cursor: pointer;
+}
+
+.buttons {
+  display: flex;
+}
+
+nav {
+  background-color: var(--tool-color);
+  color: var(--dark-text-color);
+  display: flex;
+  justify-content: space-between;
+
+  height: var(--nav-height);
+  line-height: var(--nav-height);
+
+  position: relative;
+  z-index: 5;
+  box-shadow: 0px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+
+  .nav-text {
+    margin-left: 25px
+  }
+
+  .nav-wrapper-left {
+    position: relative;
+    height: 100%;
+    display: flex;
+    text-align: center;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .nav-wrapper-right {
+    position: relative;
+    height: 100%;
+    display: flex;
+    text-align: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    margin-right: 20px;
+  }
+
+  .tool-name {
+    padding-left: 10px;
+    padding-right: 10px;
+  } 
+
+  .tool-title {
+    font-size: 20px;
+  }
+
+  .right-buttons {
+    display: flex;
+
+    .nav-button {
+      height: var(--nav-height);
+      width: var(--nav-height);
+      line-height: calc(var(--nav-height) + 5px);
+    }
+  }
+}
+
+.to-do {
+  display: none;
+}

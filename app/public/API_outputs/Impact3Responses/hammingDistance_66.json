@@ -1,0 +1,7 @@
+{
+  "hamming_no" : 0.021505376344086002,
+  "entailed_yes" : [ ],
+  "entailed_both" : [ "(Doctor ⊓ ∃worksIn.OperatingRoom) ⊑ Surgeon", "Anasthesiologist ⊑ ∃worksIn.OperatingRoom" ],
+  "hamming_yes" : 0.010752688172043001,
+  "entailed_no" : [ ]
+}

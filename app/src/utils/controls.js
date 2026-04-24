@@ -36,7 +36,7 @@ const $overview_config = $('#overview-config');
 
 const url = new URL(window.location.href);
 const params = new URLSearchParams(url.search);
-const PROJECT = params.get('id') || 0;
+const PROJECT = params.get('id') || 'test';
 
 let pane = null;
 let tippies = {};

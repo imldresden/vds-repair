@@ -323,6 +323,11 @@ export function createDecisionTree(container, treeData, fullTreeData) {
     }));
   };
 
+  cy.on('layoutstop', ()=> { // select first node asap, only once
+    cy.$('node').select();
+    cy.off('layoutstop');
+  });
+
   cy.on('tap', 'node', (event) => {
     activeDecisionTreeCy = cy;
     const nodeId = event.target.data('nodeId');
@@ -372,12 +377,12 @@ export function createDecisionTree(container, treeData, fullTreeData) {
     if (activeDecisionTreeCy && activeDecisionTreeCy !== cy) {
       return;
     }
-    
+
     const selectedNodes = cy.$('node:selected');
     if (selectedNodes.length === 0) {
       return;
     }
-    
+
     if (e.key === 'k' || e.key === 'K') {
       if (e._dlRepairHandled) {
         return;
@@ -402,10 +407,10 @@ export function createDecisionTree(container, treeData, fullTreeData) {
       if (e._dlRepairHandled) {
         return;
       }
-      
+
       e.preventDefault();
       e._dlRepairHandled = true;
-      
+
       if (e.ctrlKey && !e.metaKey) {
         expandNodeInNewPane(cy, selectedNodes[0].data('nodeId'));
       } else if (e.metaKey) {
@@ -444,11 +449,11 @@ export function createDecisionTree(container, treeData, fullTreeData) {
         const visibleChildren = childEdges
           .map(edge => ({ edge, node: cy.getElementById(edge.target) }))
           .filter(item => item.node.length > 0);
-        
+
         if (visibleChildren.length > 0) {
           const keepChild = visibleChildren.find(item => item.edge.type === 'keep');
           const targetChild = keepChild || visibleChildren[0];
-          
+
           currentNode.unselect();
           targetChild.node.select();
           dispatchNodeSelected(targetChild.node.data('nodeId'));
@@ -507,9 +512,9 @@ export function createDecisionTree(container, treeData, fullTreeData) {
       return;
     }
   };
-  
+
   document.addEventListener('keydown', keyboardHandler);
-  
+
   cy.keyboardHandler = keyboardHandler;
 
   if (cy.contextMenus) {
@@ -615,7 +620,7 @@ export function createDecisionTree(container, treeData, fullTreeData) {
     const edge = event.target;
     const targetNodeId = edge.target().data('nodeId');
     const edgeType = edge.data('type');
-    
+
     document.dispatchEvent(new CustomEvent('decision-tree-edge-clicked', {
       detail: {
         target: targetNodeId,
@@ -704,14 +709,14 @@ export function highlightPath(cy, nodeId) {
 
 async function updateLeafNodeSymbols(cy, nodeId) {
   if (!cy || !cy.treeData) return;
-  
+
   try {
     const dlRepairApi = (await import('../utils/mock-dl-repair-api.js')).default;
     const nodeIdStr = `node-${nodeId}`;
-    
+
     const probabilities = await dlRepairApi.getImpactProbabilities(nodeId);
     if (!probabilities) return;
-    
+
     const hasKeepRepair = probabilities.yes && probabilities.yes !== 'No Repair!';
     const hasRemoveRepair = probabilities.no && probabilities.no !== 'No Repair!';
 
@@ -724,7 +729,7 @@ async function updateLeafNodeSymbols(cy, nodeId) {
         let background = 'transparent';
         let borderColor = COLORS.NODE_COLOR;
         let backgroundOpacity = 0;
-        
+
         if (edge.type === 'keep') {
           if (hasKeepRepair) {
             symbol = '✓';
@@ -754,7 +759,7 @@ async function updateLeafNodeSymbols(cy, nodeId) {
             backgroundOpacity = 1;
           }
         }
-        
+
         childNode.data('repairSymbol', symbol);
         childNode.data('symbolColor', color);
         childNode.data('symbolBackground', background);
@@ -818,12 +823,12 @@ export function expandNode(cy, nodeId) {
   if (!cy || !cy.treeData) return;
 
   const nodeIdStr = `node-${nodeId}`;
-  
+
   if (cy.getElementById(nodeIdStr).length === 0) {
     console.error(`Node ${nodeIdStr} does not exist in cy instance!`);
     return;
   }
-  
+
   const expandedTypes = getExpandedTypes(cy, nodeId);
   if (expandedTypes.has('all')) {
     return;
@@ -836,7 +841,7 @@ export function expandNode(cy, nodeId) {
   }
 
   const targetNodeIds = childEdges.map(edge => edge.target);
-  
+
   const childNodes = cy.treeData.nodes.filter(node => targetNodeIds.includes(node.id));
 
   const newElements = [];
@@ -859,7 +864,7 @@ export function expandNode(cy, nodeId) {
     expandedTypes.add('remove');
     expandedTypes.add('all');
     syncNodeExpansionClass(cy, nodeId);
-    
+
     cy.layout({
       name: 'dagre',
       directed: true,
@@ -1036,14 +1041,14 @@ export function expandNodeInNewPane(cy, nodeId) {
   if (!cy || !cy.treeData) return;
 
   const subtree = extractSubtree(cy.treeData, nodeId);
-  
+
   if (subtree.nodes.length === 0) {
     console.log(`Node ${nodeId} has no subtree`);
     return;
   }
 
   const paneId = cy.container().closest('.pane')?.id || 'pane-0';
-  
+
   const newPane = spawnPane({
     spawner: paneId,
     id: `dl-repair-${Date.now()}`,
@@ -1062,7 +1067,7 @@ export function expandNodeInNewPane(cy, nodeId) {
   }
 
   const newCy = createInitialTree(newContainer, subtree);
-  
+
   if (newCy) {
     newCy.paneId = newPane.id;
     newPane.cy = newCy;
@@ -1071,7 +1076,7 @@ export function expandNodeInNewPane(cy, nodeId) {
       detail: { paneId: newPane.id },
     }));
     dispatchPaneDataChanged(newCy);
-    
+
     runAfterRender(() => {
       const rootNode = subtree.nodes[0];
       if (rootNode) {
@@ -1090,21 +1095,21 @@ export function createInitialTree(container, treeData) {
   }
 
   let rootNode = null;
-  
+
   const targetIds = new Set(treeData.edges.map(e => e.target));
 
   rootNode = treeData.nodes.find(node => !targetIds.has(node.id));
-  
+
   if (!rootNode && treeData.nodes.length > 0) {
     console.warn('No node without incoming edges found, using first node');
     rootNode = treeData.nodes[0];
   }
-  
+
   if (!rootNode) {
     console.error('Root node not found');
     return null;
   }
-  
+
   const initialData = {
     nodes: [
       {
@@ -1117,7 +1122,7 @@ export function createInitialTree(container, treeData) {
   };
 
   const cy = createDecisionTree(container, initialData, treeData);
-  
+
   if (!cy) {
     console.error('Failed to create cy instance');
     return null;

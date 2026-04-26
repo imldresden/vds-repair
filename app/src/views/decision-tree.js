@@ -1,6 +1,6 @@
 import { cytoscape } from './imports/import-cytoscape.js';
 import { COLORS, OUTLINES } from '../style/views/variables.js';
-import { spawnPane, getPanes } from './panes/panes.js';
+import { spawnPane } from './panes/panes.js';
 import { destroyPanes } from './panes/panes.js';
 import { CONSTANTS } from '../utils/names.js';
 import { openClassHierarchyPane } from './class-hierarchy-pane.js';
@@ -8,22 +8,216 @@ import { setPane } from '../utils/controls.js';
 
 let activeDecisionTreeCy = null;
 
+const DECISION_TREE_LAYOUT_MODE = {
+  HORIZONTAL: 'horizontal',
+  VERTICAL: 'vertical',
+};
+
+function getDecisionTreeLayoutOptions(mode = DECISION_TREE_LAYOUT_MODE.HORIZONTAL) {
+  const options = {
+    name: 'dagre',
+    directed: true,
+    rankDir: mode === DECISION_TREE_LAYOUT_MODE.VERTICAL ? 'TB' : 'LR',
+    animate: true,
+    animationDuration: 500,
+  };
+
+  if (mode === DECISION_TREE_LAYOUT_MODE.VERTICAL) {
+    options.sort = sortVerticalDecisionTreeElements;
+    options.transform = createVerticalDecisionTreeTransform();
+  }
+
+  return options;
+}
+
+function getDecisionTreeElementOrder(ele) {
+  if (!ele?.isEdge?.()) {
+    return 1;
+  }
+
+  if (ele.data('type') === 'remove') {
+    return 0;
+  }
+
+  if (ele.data('type') === 'keep') {
+    return 2;
+  }
+
+  return 1;
+}
+
+function sortVerticalDecisionTreeElements(a, b) {
+  return getDecisionTreeElementOrder(a) - getDecisionTreeElementOrder(b);
+}
+
+function getVisibleDecisionTreeSubtree(cy, rootNode) {
+  const subtreeIds = new Set();
+  const stack = [rootNode];
+
+  while (stack.length > 0) {
+    const node = stack.pop();
+    if (node?.nonempty?.() && !subtreeIds.has(node.id())) {
+      subtreeIds.add(node.id());
+      cy.edges().forEach((edge) => {
+        if (edge.source().id() === node.id() && edge.target().nonempty()) {
+          stack.push(edge.target());
+        }
+      });
+    }
+  }
+
+  return cy.nodes().filter(node => subtreeIds.has(node.id()));
+}
+
+function getLayoutPosition(node) {
+  const dagrePosition = node.scratch('dagre');
+  if (dagrePosition) {
+    return dagrePosition;
+  }
+
+  return node.position();
+}
+
+function computeVerticalBranchOffsets(cy) {
+  const offsets = new Map();
+  if (!cy || cy.decisionTreeLayoutMode !== DECISION_TREE_LAYOUT_MODE.VERTICAL) {
+    return offsets;
+  }
+
+  const orderedParents = cy.nodes().sort((a, b) => (
+    getLayoutPosition(a).y - getLayoutPosition(b).y
+  ));
+
+  orderedParents.forEach((parent) => {
+    const childEdges = parent.outgoers('edge');
+    const keepEdge = childEdges.filter(edge => edge.data('type') === 'keep').first();
+    const removeEdge = childEdges.filter(edge => edge.data('type') === 'remove').first();
+
+    if (!keepEdge?.nonempty?.() || !removeEdge?.nonempty?.()) {
+      return;
+    }
+
+    const keepChild = keepEdge.target();
+    const removeChild = removeEdge.target();
+    const keepX = getLayoutPosition(keepChild).x + (offsets.get(keepChild.id()) || 0);
+    const removeX = getLayoutPosition(removeChild).x + (offsets.get(removeChild.id()) || 0);
+
+    if (keepX >= removeX) {
+      return;
+    }
+
+    const keepSubtree = getVisibleDecisionTreeSubtree(cy, keepChild);
+    const removeSubtree = getVisibleDecisionTreeSubtree(cy, removeChild);
+    const hasOverlap = keepSubtree.some(keepNode => (
+      removeSubtree.some(removeNode => removeNode.id() === keepNode.id())
+    ));
+
+    if (hasOverlap) {
+      return;
+    }
+
+    const dx = removeX - keepX;
+    keepSubtree.forEach((node) => {
+      offsets.set(node.id(), (offsets.get(node.id()) || 0) + dx);
+    });
+    removeSubtree.forEach((node) => {
+      offsets.set(node.id(), (offsets.get(node.id()) || 0) - dx);
+    });
+  });
+
+  return offsets;
+}
+
+function createVerticalDecisionTreeTransform() {
+  let offsets = null;
+
+  return (node, position) => {
+    offsets ||= computeVerticalBranchOffsets(node.cy());
+    return {
+      x: position.x + (offsets.get(node.id()) || 0),
+      y: position.y,
+    };
+  };
+}
+
+function runDecisionTreeLayout(cy, mode = cy?.decisionTreeLayoutMode) {
+  if (!cy) {
+    return;
+  }
+
+  cy.decisionTreeLayout?.stop?.();
+  cy.decisionTreeLayoutMode = mode || DECISION_TREE_LAYOUT_MODE.HORIZONTAL;
+  const layout = cy.layout(getDecisionTreeLayoutOptions(cy.decisionTreeLayoutMode));
+  cy.decisionTreeLayout = layout;
+  layout.pon('layoutstop').then(() => {
+    if (cy.decisionTreeLayout === layout) {
+      cy.decisionTreeLayout = null;
+    }
+  });
+  layout.run();
+}
+
+function addDecisionTreeLayoutToggle(cy, container) {
+  const paneElement = container?.parentElement;
+  if (!cy || !paneElement) {
+    return;
+  }
+
+  if (getComputedStyle(paneElement).position === 'static') {
+    paneElement.style.position = 'relative';
+  }
+
+  let header = paneElement.querySelector('.decision-tree-pane-header');
+  if (!header) {
+    header = document.createElement('div');
+    header.className = 'decision-tree-pane-header';
+    paneElement.prepend(header);
+  }
+
+  header.innerHTML = `
+    <div class="decision-tree-pane-header-inner">
+      <span class="decision-tree-pane-title">Decision Tree</span>
+      <button type="button" class="decision-tree-layout-toggle" data-layout-toggle title="Switch to vertical layout" aria-label="Switch to vertical layout">
+        <i class="fa-solid fa-arrows-left-right"></i>
+      </button>
+    </div>
+  `;
+
+  const layoutToggle = header.querySelector('[data-layout-toggle]');
+
+  const setLayoutToggleState = (mode) => {
+    cy.decisionTreeLayoutMode = mode;
+    if (!layoutToggle) {
+      return;
+    }
+
+    const isHorizontal = mode === DECISION_TREE_LAYOUT_MODE.HORIZONTAL;
+    layoutToggle.innerHTML = isHorizontal
+      ? '<i class="fa-solid fa-arrows-left-right"></i>'
+      : '<i class="fa-solid fa-arrows-up-down"></i>';
+    layoutToggle.title = isHorizontal
+      ? 'Switch to vertical layout'
+      : 'Switch to horizontal layout';
+    layoutToggle.setAttribute('aria-label', layoutToggle.title);
+  };
+
+  setLayoutToggleState(cy.decisionTreeLayoutMode || DECISION_TREE_LAYOUT_MODE.HORIZONTAL);
+
+  if (layoutToggle) {
+    layoutToggle.onclick = () => {
+      const nextMode = cy.decisionTreeLayoutMode === DECISION_TREE_LAYOUT_MODE.HORIZONTAL
+        ? DECISION_TREE_LAYOUT_MODE.VERTICAL
+        : DECISION_TREE_LAYOUT_MODE.HORIZONTAL;
+      setLayoutToggleState(nextMode);
+      runDecisionTreeLayout(cy, nextMode);
+    };
+  }
+}
+
 function runAfterRender(callback) {
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       callback();
-    });
-  });
-}
-
-function fitAllPanesAfterLayout() {
-  runAfterRender(() => {
-    const panes = getPanes();
-    Object.values(panes).forEach(pane => {
-      if (pane.cy) {
-        pane.cy.resize();
-        pane.cy.fit(undefined, 30);
-      }
     });
   });
 }
@@ -56,11 +250,12 @@ function createNodeElement(node, treeData) {
 
 function createEdgeElement(edge) {
   const edgeLabel = edge.label || edge.type;
-  const normalizedLabel = edgeLabel === 'keep'
-    ? 'kept'
-    : edgeLabel === 'remove'
-      ? 'removed'
-      : edgeLabel;
+  let normalizedLabel = edgeLabel;
+  if (edgeLabel === 'keep') {
+    normalizedLabel = 'kept';
+  } else if (edgeLabel === 'remove') {
+    normalizedLabel = 'removed';
+  }
 
   return {
     data: {
@@ -270,13 +465,7 @@ export function createDecisionTree(container, treeData, fullTreeData) {
     container,
     elements,
     style: createDecisionTreeStylesheet(),
-    layout: {
-      name: 'dagre',
-      directed: true,
-      rankDir: 'LR',
-      animate: true,
-      animationDuration: 500,
-    },
+    layout: getDecisionTreeLayoutOptions(),
     zoom: 1,
     pan: { x: 0, y: 0 },
     minZoom: 0.1,
@@ -286,6 +475,7 @@ export function createDecisionTree(container, treeData, fullTreeData) {
 
   cy.treeData = treeData;
   cy.expandedNodes = new Map();
+  cy.decisionTreeLayoutMode = DECISION_TREE_LAYOUT_MODE.HORIZONTAL;
   cy.vars ||= {};
   cy.vars['pcp-auto-sync'] ||= { value: true };
   cy.vars['pcp-refine'] ||= { value: true };
@@ -637,6 +827,7 @@ export function createDecisionTree(container, treeData, fullTreeData) {
     setPane(cy.paneId);
   }
 
+  addDecisionTreeLayoutToggle(cy, container);
   cy.fit();
 
   return cy;
@@ -650,15 +841,7 @@ export function updateDecisionTree(cy, treeData) {
   const elements = createTreeElements(treeData);
 
   cy.add(elements);
-  cy.layout({
-    name: 'dagre',
-    directed: true,
-    rankDir: 'LR',
-    animate: true,
-    animationDuration: 500,
-  }).run();
-
-  fitAllPanesAfterLayout();
+  runDecisionTreeLayout(cy);
 }
 
 export function navigateToNode(cy, nodeId) {
@@ -865,16 +1048,9 @@ export function expandNode(cy, nodeId) {
     expandedTypes.add('all');
     syncNodeExpansionClass(cy, nodeId);
 
-    cy.layout({
-      name: 'dagre',
-      directed: true,
-      rankDir: 'LR',
-      animate: true,
-      animationDuration: 500,
-    }).run();
+    runDecisionTreeLayout(cy);
 
     dispatchPaneDataChanged(cy);
-    fitAllPanesAfterLayout();
     updateLeafNodeSymbols(cy, nodeId);
   }
 }
@@ -924,16 +1100,9 @@ export function expandNodeByType(cy, nodeId, edgeType) {
     expandedTypes.add(edgeType);
     syncNodeExpansionClass(cy, nodeId);
 
-    cy.layout({
-      name: 'dagre',
-      directed: true,
-      rankDir: 'LR',
-      animate: true,
-      animationDuration: 500,
-    }).run();
+    runDecisionTreeLayout(cy);
 
     dispatchPaneDataChanged(cy);
-    fitAllPanesAfterLayout();
     updateLeafNodeSymbols(cy, nodeId);
   }
 }
@@ -994,17 +1163,9 @@ function collapseNode(cy, nodeId) {
   currentNode.removeClass('expanded partially-expanded leaf has-children');
   syncNodeExpansionClass(cy, nodeId);
 
-  cy.layout({
-    name: 'dagre',
-    directed: true,
-    rankDir: 'LR',
-    animate: true,
-    animationDuration: 500,
-  }).run();
+  runDecisionTreeLayout(cy);
 
   dispatchPaneDataChanged(cy);
-
-  fitAllPanesAfterLayout();
 }
 
 function extractSubtree(treeData, nodeId) {
@@ -1082,8 +1243,6 @@ export function expandNodeInNewPane(cy, nodeId) {
       if (rootNode) {
         expandNode(newCy, rootNode.nodeId);
       }
-
-      fitAllPanesAfterLayout();
     });
   }
 }

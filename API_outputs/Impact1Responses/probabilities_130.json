@@ -1,0 +1,8 @@
+{
+  "no" : {
+    "(Doctor ⊓ ∃worksIn.OperatingRoom) ⊑ Surgeon" : 100.0,
+    "Anasthesiologist ⊑ Doctor" : 0.0,
+    "Anasthesiologist ⊑ ∃worksIn.OperatingRoom" : 100.0
+  },
+  "yes" : "No Repair!"
+}

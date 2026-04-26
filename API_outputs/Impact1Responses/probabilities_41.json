@@ -1,0 +1,12 @@
+{
+  "no" : {
+    "(Doctor ⊓ ∃worksIn.OperatingRoom) ⊑ Surgeon" : 0.0,
+    "Anasthesiologist ⊑ Doctor" : 100.0,
+    "Anasthesiologist ⊑ ∃worksIn.OperatingRoom" : 0.0
+  },
+  "yes" : {
+    "(Doctor ⊓ ∃worksIn.OperatingRoom) ⊑ Surgeon" : 100.0,
+    "Anasthesiologist ⊑ Doctor" : 100.0,
+    "Anasthesiologist ⊑ ∃worksIn.OperatingRoom" : 0.0
+  }
+}

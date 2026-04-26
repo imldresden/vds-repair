@@ -1,0 +1,5 @@
+{
+  "hamming_no" : 0.010869565217391353,
+  "hamming_yes" : "No Repair!",
+  "entailed_no" : [ "(Doctor ⊓ ∃worksIn.OperatingRoom) ⊑ Surgeon", "Anasthesiologist ⊑ ∃worksIn.OperatingRoom" ]
+}

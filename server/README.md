@@ -1,1 +1,0 @@
-Use `npm install` and `node server.js` to enable a simple server for file management.

@@ -270,7 +270,7 @@ export function createAxiomPane(container, treeData, paneId) {
   initializeAxiomStates(paneId, treeData);
 
   const axiomsByDepth = getAxiomsByDepth(treeData);
-  const verticalSpacing = 100;
+  const verticalSpacing = 50;
   const elements = createAxiomElements(axiomsByDepth, verticalSpacing);
 
   const cy = cytoscape({

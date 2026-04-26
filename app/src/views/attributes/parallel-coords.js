@@ -1312,44 +1312,44 @@ function parallelCoords(pane, data, metadata) {
           .on('end', brush); // updates brush if clicked elsewhere on axis
       });
 
-    makeCtxMenu(pane.details, pane, publicFunctions, {
-      extras: [
-        {
-          label: 'Select Minimum',
-          callback: (e) => drawBrushMinMax(data, e.axisName, pane, 'min'),
-        },
-        {
-          label: 'Select Maximum',
-          callback: (e) => drawBrushMinMax(data, e.axisName, pane, 'max'),
-        },
-        {
-          label: 'Compare Selected Nodes',
-          callback: () => {
-            const selection = publicFunctions.getSelection();
-            if (selection.length < 2) {
-              alert('Please select at least 2 nodes to compare.');
-            } else {
-              const nodeIds = selection.map(s => s.id);
-              publicFunctions.setComparison(nodeIds);
+    // makeCtxMenu(pane.details, pane, publicFunctions, {
+    //   extras: [
+    //     {
+    //       label: 'Select Minimum',
+    //       callback: (e) => drawBrushMinMax(data, e.axisName, pane, 'min'),
+    //     },
+    //     {
+    //       label: 'Select Maximum',
+    //       callback: (e) => drawBrushMinMax(data, e.axisName, pane, 'max'),
+    //     },
+    //     {
+    //       label: 'Compare Selected Nodes',
+    //       callback: () => {
+    //         const selection = publicFunctions.getSelection();
+    //         if (selection.length < 2) {
+    //           alert('Please select at least 2 nodes to compare.');
+    //         } else {
+    //           const nodeIds = selection.map(s => s.id);
+    //           publicFunctions.setComparison(nodeIds);
 
-              // Also trigger the comparison dialog if we have access to cy
-              if (pane.cy && pane.cy.nodes) {
-                const nodes = nodeIds.map(id => pane.cy.$('#' + id)).filter(n => n.length > 0);
-                if (nodes.length > 0 && window.buildComparisonTooltip) {
-                  window.buildComparisonTooltip(pane.cy, nodes);
-                }
-              }
-            }
-          },
-        },
-        {
-          label: 'Clear Comparison',
-          callback: () => {
-            publicFunctions.clearComparison();
-          },
-        },
-      ],
-    });
+    //           // Also trigger the comparison dialog if we have access to cy
+    //           if (pane.cy && pane.cy.nodes) {
+    //             const nodes = nodeIds.map(id => pane.cy.$('#' + id)).filter(n => n.length > 0);
+    //             if (nodes.length > 0 && window.buildComparisonTooltip) {
+    //               window.buildComparisonTooltip(pane.cy, nodes);
+    //             }
+    //           }
+    //         }
+    //       },
+    //     },
+    //     {
+    //       label: 'Clear Comparison',
+    //       callback: () => {
+    //         publicFunctions.clearComparison();
+    //       },
+    //     },
+    //   ],
+    // });
 
     drawBrushed();
     updateCountStrings();

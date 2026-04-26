@@ -202,8 +202,8 @@ body.dl-repair-layout-active #container {
   --dl-left-basis: 28%;
   --dl-center-basis: 47%;
   --dl-right-basis: 25%;
-  --dl-summary-height-px: 240px;
-  --dl-star-height-px: 360px;
+  --dl-summary-height-px: 100%;
+  --dl-star-height-px: 100%;
   display: flex;
   width: 100%;
   height: 100%;
@@ -238,7 +238,7 @@ body.dl-repair-layout-active #container {
   min-width: 280px;
   min-height: 0;
   display: grid;
-  grid-template-rows: minmax(160px, var(--dl-summary-height-px)) 4px minmax(220px, var(--dl-star-height-px));
+  grid-template-rows: minmax(0px, var(--dl-summary-height-px)) 4px minmax(0px, var(--dl-star-height-px));
   row-gap: 0;
   box-sizing: border-box;
 }

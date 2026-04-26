@@ -312,11 +312,10 @@ function initializeDLRepairLayoutResizers() {
     const navHeight = Number.parseFloat(getComputedStyle(document.body).getPropertyValue('--nav-height')) || 35;
     const viewportHeight = Math.max(0, window.innerHeight - navHeight);
     const layoutHeight = Math.min(layout.clientHeight || viewportHeight, viewportHeight);
-    const centerPaddingY = 16;
     const centerGap = 4;
-    const usableCenterHeight = Math.max(0, layoutHeight - centerPaddingY - centerGap);
-    const minSummaryHeight = 160;
-    const minStarHeight = 220;
+    const usableCenterHeight = Math.max(0, layoutHeight - centerGap);
+    const minSummaryHeight = 20;
+    const minStarHeight = 20;
     const preferredSummaryHeight = Math.round(usableCenterHeight * (DL_REPAIR_LAYOUT.summaryHeightPct / 100));
     const maxSummaryHeight = Math.max(minSummaryHeight, usableCenterHeight - minStarHeight);
     const summaryHeight = clamp(preferredSummaryHeight, minSummaryHeight, maxSummaryHeight);
@@ -363,8 +362,8 @@ function initializeDLRepairLayoutResizers() {
           return;
         }
         const usableCenterHeight = Math.max(0, centerRect.height - 4);
-        const minSummaryHeight = 160;
-        const minStarHeight = 220;
+        const minSummaryHeight = 0;
+        const minStarHeight = 0;
         const startSummaryHeight = (start.summaryHeightPct / 100) * usableCenterHeight;
         const nextSummaryHeight = clamp(
           startSummaryHeight + (moveEvent.clientY - startY),
@@ -485,7 +484,7 @@ function setupDLRepairSidebarResize() {
       return;
     }
 
-    const minWidth = 240;
+    const minWidth = 0;
     const maxWidth = Math.max(360, Math.floor(window.innerWidth * 0.7));
     const delta = startX - event.clientX;
     root.style.setProperty('--config-width', `${Math.max(minWidth, Math.min(maxWidth, startWidth + delta))}px`);
@@ -596,14 +595,14 @@ function generateProbabilitiesBarChart(probabilities) {
   const renderAxiomLabelWithIcon = (axiom, dimensions, textColor = null) => {
     const colorStyle = textColor ? ` color: ${textColor}; font-weight: 600;` : '';
     const escapedAxiomForJs = escapeSingleQuotedJs(axiom);
-    return `<div style="display:flex;align-items:center;gap:6px;font-size:13px;margin-bottom:4px;word-wrap:break-word;${colorStyle}">${createMiniStarAxisIcon(axiom, dimensions)}<span style="min-width:0;overflow-wrap:anywhere;cursor:pointer;" onmouseenter="this.style.fontWeight='700'; window.dlRepairHighlightStarAxis && window.dlRepairHighlightStarAxis('${escapedAxiomForJs}')" onmouseleave="this.style.fontWeight=''; window.dlRepairClearStarAxisHighlight && window.dlRepairClearStarAxisHighlight()">${axiom}</span></div>`;
+    return `<div style="display:flex;align-items:center;gap:6px;font-size:16px;margin-bottom:4px;word-wrap:break-word;${colorStyle}">${createMiniStarAxisIcon(axiom, dimensions)}<span style="min-width:0;overflow-wrap:anywhere;cursor:pointer;" onmouseenter="this.style.fontWeight='700'; window.dlRepairHighlightStarAxis && window.dlRepairHighlightStarAxis('${escapedAxiomForJs}')" onmouseleave="this.style.fontWeight=''; window.dlRepairClearStarAxisHighlight && window.dlRepairClearStarAxisHighlight()">${axiom}</span></div>`;
   };
 
   const allAxiomDimensions = Array.from(allAxioms);
-  let html = '<div style="font-family:monospace;font-size:13px;border-bottom:1px solid #d3d3d3;padding-bottom:10px;margin-bottom:14px;width:100%;box-sizing:border-box;">';
+  let html = '<div style="font-family:monospace;font-size:16px;border-bottom:1px solid #d3d3d3;padding-bottom:10px;margin-bottom:14px;width:100%;box-sizing:border-box;">';
   html += '<div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;width:100%;box-sizing:border-box;" onclick="const content=document.getElementById(\'probabilities-content\'); const triangle=document.getElementById(\'probabilities-triangle\'); const isOpen=content.style.display!==\'none\'; content.style.display=isOpen ? \'none\' : \'block\'; triangle.style.transform=isOpen ? \'scaleX(1.35) rotate(180deg)\' : \'scaleX(1.35) rotate(0deg)\';">';
   html += '<h4 style="margin:0;font-size:17px;">Axiom Probabilities (keep/remove)</h4>';
-  html += '<span id="probabilities-triangle" style="font-family:Arial,sans-serif;font-weight:700;font-size:13px;line-height:1;display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;text-align:center;transform:scaleX(1.35) rotate(0deg);transform-origin:center center;flex-shrink:0;">▴</span>';
+  html += '<span id="probabilities-triangle" style="font-family:Arial,sans-serif;font-weight:700;font-size:16px;line-height:1;display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;text-align:center;transform:scaleX(1.35) rotate(0deg);transform-origin:center center;flex-shrink:0;">▴</span>';
   html += '</div>';
   html += '<div id="probabilities-content" style="display:block;padding-top:8px;width:100%;box-sizing:border-box;">';
 
@@ -657,7 +656,7 @@ function generateProbabilitiesBarChart(probabilities) {
 
 function generateHammingDistanceSection(distance) {
   if (!distance) {
-    return '<p style="margin-top:14px;font-size:13px;">No hamming distance data available</p>';
+    return '<p style="margin-top:14px;font-size:16px;">No hamming distance data available</p>';
   }
 
   const isNoRepairValue = (value) => typeof value === 'string' && value.trim().toLowerCase() === 'no repair!';
@@ -692,11 +691,11 @@ function generateHammingDistanceSection(distance) {
   let html = '<div style="margin-top:18px;border-bottom:1px solid #d3d3d3;padding-bottom:10px;margin-bottom:10px;width:100%;box-sizing:border-box;">';
   html += '<div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;width:100%;box-sizing:border-box;" onclick="const content=document.getElementById(\'hamming-content\'); const triangle=document.getElementById(\'hamming-triangle\'); const isOpen=content.style.display!==\'none\'; content.style.display=isOpen ? \'none\' : \'block\'; triangle.style.transform=isOpen ? \'scaleX(1.35) rotate(180deg)\' : \'scaleX(1.35) rotate(0deg)\';">';
   html += '<h4 style="margin:0;font-size:17px;">Hamming Distance</h4>';
-  html += '<span id="hamming-triangle" style="font-family:Arial,sans-serif;font-weight:700;font-size:13px;line-height:1;display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;text-align:center;transform:scaleX(1.35) rotate(0deg);transform-origin:center center;flex-shrink:0;">▴</span>';
+  html += '<span id="hamming-triangle" style="font-family:Arial,sans-serif;font-weight:700;font-size:16px;line-height:1;display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;text-align:center;transform:scaleX(1.35) rotate(0deg);transform-origin:center center;flex-shrink:0;">▴</span>';
   html += '</div>';
   html += '<div id="hamming-content" style="display:block;padding-top:8px;width:100%;box-sizing:border-box;">';
   html += '<div style="font-size:11px;color:#666;margin-bottom:8px;">Tip: Ctrl+click on a distance choice to propagate it.</div>';
-  html += `<div style="font-size:13px;margin-bottom:10px;"><span data-hamming-choice="yes" data-hamming-hover-target="yes" title="${propagateTip}" style="color:#2b8a3e;font-weight:600;cursor:pointer;" onmouseover="${bothHoverKeep}" onmouseout="${bothHoverReset}">keep</span> <span data-hamming-choice="yes" data-hamming-hover-target="yes" title="${propagateTip}" style="cursor:pointer;" onmouseover="${bothHoverKeep}" onmouseout="${bothHoverReset}">${yesDisplay}</span> ${compareSymbol} <span data-hamming-choice="no" data-hamming-hover-target="yes" title="${propagateTip}" style="color:#c92a2a;font-weight:600;cursor:pointer;" onmouseover="${bothHoverRemove}" onmouseout="${bothHoverReset}">remove</span> <span data-hamming-choice="no" data-hamming-hover-target="yes" title="${propagateTip}" style="cursor:pointer;" onmouseover="${bothHoverRemove}" onmouseout="${bothHoverReset}">${noDisplay}</span></div>`;
+  html += `<div style="font-size:16px;margin-bottom:10px;"><span data-hamming-choice="yes" data-hamming-hover-target="yes" title="${propagateTip}" style="color:#2b8a3e;font-weight:600;cursor:pointer;" onmouseover="${bothHoverKeep}" onmouseout="${bothHoverReset}">keep</span> <span data-hamming-choice="yes" data-hamming-hover-target="yes" title="${propagateTip}" style="cursor:pointer;" onmouseover="${bothHoverKeep}" onmouseout="${bothHoverReset}">${yesDisplay}</span> ${compareSymbol} <span data-hamming-choice="no" data-hamming-hover-target="yes" title="${propagateTip}" style="color:#c92a2a;font-weight:600;cursor:pointer;" onmouseover="${bothHoverRemove}" onmouseout="${bothHoverReset}">remove</span> <span data-hamming-choice="no" data-hamming-hover-target="yes" title="${propagateTip}" style="cursor:pointer;" onmouseover="${bothHoverRemove}" onmouseout="${bothHoverReset}">${noDisplay}</span></div>`;
   html += '<div style="display:flex;flex-direction:column;gap:10px;">';
   html += `<div data-hamming-choice="yes" style="border:1px solid #d9e8d9;border-radius:2px;padding:11px 13px;background:#f5fff5;cursor:pointer;" onmouseover="${bothHoverKeep}" onmouseout="${bothHoverReset}">`;
   html += '<div style="font-weight:600;font-size:14px;color:#2b8a3e;display:inline-block;">keep</div>';
@@ -1017,12 +1016,24 @@ async function updateDecisionTreePCP(pane, selectedNodeIds) {
       detailElement.appendChild(toggle);
     }
     toggle.innerHTML = `
-      <div class="decision-tree-plot-toggle-row">
-        <button class="decision-tree-plot-toggle-btn ${mode === DECISION_TREE_PLOT_MODE.PCP ? 'active' : ''}" data-mode="${DECISION_TREE_PLOT_MODE.PCP}">PCP</button>
-        <button class="decision-tree-plot-toggle-btn ${mode === DECISION_TREE_PLOT_MODE.STAR ? 'active' : ''}" data-mode="${DECISION_TREE_PLOT_MODE.STAR}">Star Plot</button>
-      </div>
-      ${mode === DECISION_TREE_PLOT_MODE.STAR ? `<label class="decision-tree-star-label-switch"><input type="checkbox" class="decision-tree-star-label-switch-input" ${showAxisLabels ? 'checked' : ''}><span>Show axis labels</span></label>` : ''}
-    `;
+      <div id="sp-settings">
+        <div class="decision-tree-plot-toggle-row">
+          <button class="decision-tree-plot-toggle-btn ${mode === DECISION_TREE_PLOT_MODE.PCP ? 'active' : ''}" data-mode="${DECISION_TREE_PLOT_MODE.PCP}">PCP</button>
+          <button class="decision-tree-plot-toggle-btn ${mode === DECISION_TREE_PLOT_MODE.STAR ? 'active' : ''}" data-mode="${DECISION_TREE_PLOT_MODE.STAR}">Star Plot</button>
+        </div>
+        <label id="checkbox-sp" style="display:none" class="decision-tree-star-label-switch"><input type="checkbox" class="decision-tree-star-label-switch-input" ${showAxisLabels ? 'checked' : ''}><span>Show axis labels</span></label>
+      </div>`;
+      
+    toggle.querySelector('#sp-settings').onmouseenter = () => {
+      if (mode === DECISION_TREE_PLOT_MODE.STAR) {
+          toggle.querySelector('#checkbox-sp').style.display = 'flex'
+      } 
+    }
+    toggle.querySelector('#sp-settings').onmouseleave = () => {
+      if (mode === DECISION_TREE_PLOT_MODE.STAR) {
+          toggle.querySelector('#checkbox-sp').style.display = 'none'
+      } 
+    }
     toggle.querySelectorAll('.decision-tree-plot-toggle-btn').forEach((button) => {
       button.onclick = () => {
         const nextMode = button.getAttribute('data-mode');
@@ -1129,7 +1140,7 @@ async function updateDecisionTreePCP(pane, selectedNodeIds) {
       }
     };
 
-    const combinedSvg = createStarPlotSvg({ dimensions, series: combinedSeries, width: combinedWidth, height: 340, title: 'Combined Star Plot (selected nodes)', showAxisLabels, selectedAxiomTexts });
+    const combinedSvg = createStarPlotSvg({ dimensions, series: combinedSeries, width: combinedWidth, height: 340, showAxisLabels, selectedAxiomTexts });
     combinedSection.appendChild(combinedSvg);
 
     const setCombinedHoverState = (hoveredNodeId = null) => {

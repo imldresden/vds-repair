@@ -31,6 +31,7 @@ const DL_REPAIR_LAYOUT = {
   centerWidth: 47,
   rightWidth: 25,
   summaryHeightPct: 38,
+  decisionSummarySwapped: false,
 };
 
 function getDlRepairHostElements() {
@@ -48,6 +49,18 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
+function getDecisionSummaryPlacement() {
+  const {
+    leftPaneHost,
+    summaryHost,
+  } = getDlRepairHostElements();
+
+  return {
+    decisionHost: DL_REPAIR_LAYOUT.decisionSummarySwapped ? summaryHost : leftPaneHost,
+    summaryPaneHost: DL_REPAIR_LAYOUT.decisionSummarySwapped ? leftPaneHost : summaryHost,
+  };
+}
+
 function triggerDLRepairPaneResize() {
   Object.values(getPanes()).forEach((pane) => {
     if (!pane?.cy) {
@@ -61,11 +74,13 @@ function triggerDLRepairPaneResize() {
 
 function applyDLRepairLayoutSizing() {
   const {
-    leftPaneHost,
-    summaryHost,
     starHost,
     classHierarchyHost,
   } = getDlRepairHostElements();
+  const {
+    decisionHost,
+    summaryPaneHost,
+  } = getDecisionSummaryPlacement();
 
   const panes = getPanes();
   const decisionPane = panes['pane-0'];
@@ -98,17 +113,17 @@ function applyDLRepairLayoutSizing() {
     pane.split = height > 0 ? detailsHeight / height : 0;
   };
 
-  if (decisionPane && leftPaneHost) {
-    setPaneRegionSize(decisionPane, leftPaneHost.clientHeight, leftPaneHost.clientWidth, {
-      containerHeight: leftPaneHost.clientHeight,
+  if (decisionPane && decisionHost) {
+    setPaneRegionSize(decisionPane, decisionHost.clientHeight, decisionHost.clientWidth, {
+      containerHeight: decisionHost.clientHeight,
       detailsHeight: starHost?.clientHeight || 0,
       hideDetails: false,
     });
   }
 
-  if (summaryPane && summaryHost) {
-    setPaneRegionSize(summaryPane, summaryHost.clientHeight, summaryHost.clientWidth, {
-      containerHeight: summaryHost.clientHeight,
+  if (summaryPane && summaryPaneHost) {
+    setPaneRegionSize(summaryPane, summaryPaneHost.clientHeight, summaryPaneHost.clientWidth, {
+      containerHeight: summaryPaneHost.clientHeight,
       hideDetails: true,
     });
   }
@@ -148,13 +163,19 @@ function buildDLRepairLayoutShell() {
   layout.id = 'dl-repair-layout';
   layout.className = 'dl-repair-layout';
   layout.setAttribute('data-class-hierarchy-visible', 'false');
+  layout.setAttribute('data-decision-summary-swapped', 'false');
   layout.innerHTML = `
     <section id="dl-repair-left-pane" class="dl-repair-panel dl-repair-panel-left" data-panel-key="decision">
       <button type="button" class="dl-repair-fullscreen-toggle" data-fullscreen-target="decision" title="Expand decision tree panel" aria-label="Expand decision tree panel">
         <i class="fa-solid fa-expand"></i>
       </button>
     </section>
-    <div class="dl-repair-resizer dl-repair-resizer-vertical" data-resize="left-center"></div>
+    <div class="dl-repair-resizer dl-repair-resizer-vertical dl-repair-resizer-left-center" data-resize="left-center">
+      <button type="button" class="dl-repair-panel-swap-toggle" data-panel-swap="decision-summary" title="Swap summary and decision tree panels" aria-label="Swap summary and decision tree panels">
+        <i class="fa-solid fa-arrow-right"></i>
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
     <section class="dl-repair-panel dl-repair-panel-center">
       <div id="dl-repair-summary-pane" class="dl-repair-center-top" data-panel-key="summary">
         <button type="button" class="dl-repair-fullscreen-toggle" data-fullscreen-target="summary" title="Expand summary graph panel" aria-label="Expand summary graph panel">
@@ -177,6 +198,58 @@ function buildDLRepairLayoutShell() {
   `;
 
   container.appendChild(layout);
+}
+
+function remountDecisionSummaryPanes({ decisionPaneId = 'pane-0', summaryPaneId = 'axiom-pane-0' } = {}) {
+  const {
+    decisionHost,
+    summaryPaneHost,
+  } = getDecisionSummaryPlacement();
+
+  const decisionPaneElement = document.getElementById(decisionPaneId);
+  const summaryPaneElement = document.getElementById(summaryPaneId);
+
+  if (decisionPaneElement && decisionHost && decisionPaneElement.parentElement !== decisionHost) {
+    decisionHost.appendChild(decisionPaneElement);
+  }
+
+  if (summaryPaneElement && summaryPaneHost && summaryPaneElement.parentElement !== summaryPaneHost) {
+    summaryPaneHost.appendChild(summaryPaneElement);
+  }
+}
+
+function setDLRepairDecisionSummarySwapped(isSwapped) {
+  const { layout } = getDlRepairHostElements();
+  DL_REPAIR_LAYOUT.decisionSummarySwapped = Boolean(isSwapped);
+
+  if (layout) {
+    layout.setAttribute(
+      'data-decision-summary-swapped',
+      DL_REPAIR_LAYOUT.decisionSummarySwapped ? 'true' : 'false',
+    );
+  }
+
+  remountDecisionSummaryPanes();
+  applyDLRepairLayoutSizing();
+  requestAnimationFrame(() => triggerDLRepairPaneResize());
+}
+
+function initializeDLRepairDecisionSummarySwapControl() {
+  const { layout } = getDlRepairHostElements();
+  if (!layout || layout.dataset.decisionSummarySwapInitialized === 'true') {
+    return;
+  }
+
+  layout.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-panel-swap="decision-summary"]');
+    if (!button) {
+      return;
+    }
+
+    setDLRepairDecisionSummarySwapped(!DL_REPAIR_LAYOUT.decisionSummarySwapped);
+  });
+
+  layout.dataset.decisionSummarySwapInitialized = 'true';
 }
 
 function initializeDLRepairFullscreenControls() {
@@ -270,12 +343,11 @@ function mountDLRepairPanes({ decisionPaneId, summaryPaneId, classHierarchyPaneI
 
   if (decisionPaneElement) {
     decisionPaneElement.classList.add('dl-repair-pane', 'dl-repair-pane-decision');
-    leftPaneHost.appendChild(decisionPaneElement);
   }
   if (summaryPaneElement) {
     summaryPaneElement.classList.add('dl-repair-pane', 'dl-repair-pane-summary');
-    summaryHost.appendChild(summaryPaneElement);
   }
+  remountDecisionSummaryPanes({ decisionPaneId, summaryPaneId });
   if (decisionDetails) {
     decisionDetails.classList.add('dl-repair-detached-details');
     starHost.appendChild(decisionDetails);
@@ -330,6 +402,10 @@ function initializeDLRepairLayoutResizers() {
   };
 
   const onMouseDown = (event) => {
+    if (event.target.closest('.dl-repair-panel-swap-toggle')) {
+      return;
+    }
+
     const resizer = event.target.closest('.dl-repair-resizer');
     if (!resizer) {
       return;
@@ -1469,6 +1545,7 @@ async function startDLRepairProject() {
     });
     initializeDLRepairClassHierarchyVisibilityHandling();
     initializeDLRepairFullscreenControls();
+    initializeDLRepairDecisionSummarySwapControl();
     initializeDLRepairLayoutResizers();
     applyDLRepairLayoutSizing();
 

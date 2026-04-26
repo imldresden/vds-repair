@@ -324,6 +324,7 @@ body.dl-repair-layout-active #container {
   position: relative;
   background: #d2d8df;
   transition: background-color 0.15s ease;
+  z-index: 25;
 }
 
 .dl-repair-resizer:hover {
@@ -337,6 +338,44 @@ body.dl-repair-layout-active #container {
 .dl-repair-resizer-horizontal {
   width: 100%;
   cursor: row-resize;
+  z-index: 0;
+}
+
+.dl-repair-resizer-left-center {
+  overflow: visible;
+}
+
+.dl-repair-panel-swap-toggle {
+  position: absolute;
+  top: 22%;
+  left: 50%;
+  width: 30px;
+  height: 56px;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(120, 129, 139, 0.42);
+  border-radius: 14px;
+  background: rgba(248, 250, 252, 0.96);
+  color: #4c5968;
+  cursor: pointer;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0;
+  box-shadow: 0 3px 8px rgba(26, 39, 53, 0.14);
+}
+
+.dl-repair-panel-swap-toggle:hover {
+  background: #ffffff;
+  border-color: rgba(90, 122, 157, 0.55);
+  color: #2f5f8f;
+}
+
+.dl-repair-panel-swap-toggle i {
+  font-size: 14px;
+  line-height: 1;
+  pointer-events: none;
 }
 
 .dl-repair-pane {

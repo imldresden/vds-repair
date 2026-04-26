@@ -1,29 +1,7 @@
 import { defineConfig } from 'vite';
+import { viteSingleFile } from 'vite-plugin-singlefile';
 
 export default defineConfig({
-  base: './', // change to vds-repair/ for deploying in github pages
-  plugins: [],
-  build: {
-    rollupOptions: {
-      input: {
-        main: 'index.html',
-      },
-      output: {
-        manualChunks: {
-          lodash: ['lodash'], 
-          d3: ['d3'],
-          cytoscape: ['cytoscape', 
-            'cytoscape-undo-redo', 
-            'cytoscape-context-menus', 
-            'cytoscape-node-html-label', 
-            'cytoscape-popper',
-          ],
-          cola: ['cytoscape-cola'], 
-          dagre: ['cytoscape-dagre'], 
-          klay: ['cytoscape-klay'],
-          utils: ['cytoscape-layout-utilities'],
-        }
-      }
-    },
-  },
+  base: './',
+  plugins: [viteSingleFile()],
 })

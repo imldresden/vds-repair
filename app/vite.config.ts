@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  base: './vds-repair/',
+  base: './', // change to vds-repair/ for deploying in github pages
   plugins: [],
   build: {
     rollupOptions: {

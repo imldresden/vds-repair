@@ -7,7 +7,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: 'index.html',
-        overview: 'overview/index.html',
       },
       output: {
         manualChunks: {
@@ -22,7 +21,6 @@ export default defineConfig({
           cola: ['cytoscape-cola'], 
           dagre: ['cytoscape-dagre'], 
           klay: ['cytoscape-klay'],
-          // elk: ['cytoscape-elk'],
           utils: ['cytoscape-layout-utilities'],
         }
       }

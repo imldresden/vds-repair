@@ -1,0 +1,9 @@
+{
+  "hamming_no" : 0.013513513513513487,
+  "entailed_yes" : [ "IceCream ⊑ ∃hasTopping.FruitTopping" ],
+  "hamming_yes_repair" : [ "SpicyIceCream ≡ (∃hasSpiciness.Hot ⊓ IceCream)" ],
+  "hamming_no_repair" : [ "SpicyIceCream ≡ (∃hasSpiciness.Hot ⊓ IceCream)", "IceCream ⊑ ∃hasTopping.FruitTopping" ],
+  "entailed_both" : [ "disjoint(PizzaBase, PizzaTopping, IceCream, Pizza)", "FruitTopping ⊑ PizzaTopping", "domain(hasTopping) = Pizza", "VegetarianTopping ⊑ PizzaTopping", "domain(hasBase) = Pizza", "Spiciness ≡ (Mild ⊔ Medium ⊔ Hot)" ],
+  "hamming_yes" : 0.0,
+  "entailed_no" : [ ]
+}

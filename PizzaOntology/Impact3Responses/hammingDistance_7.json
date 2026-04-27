@@ -1,0 +1,9 @@
+{
+  "hamming_no" : 0.030303030303030276,
+  "entailed_yes" : [ "(Doctor ⊓ ∃worksIn.OperatingRoom) ⊑ Surgeon" ],
+  "hamming_yes_repair" : [ "Anasthesiologist ⊑ ERDoctor", "domain(worksIn) = Staff", "Anasthesiologist ⊑ Doctor", "Anasthesiologist ⊑ ∃attends.(EmergencyPatient ⊔ SurgicalPatient)" ],
+  "hamming_no_repair" : [ "domain(worksIn) = Staff", "Doctor ⊑ Staff", "ERDoctor ⊑ OnCall" ],
+  "entailed_both" : [ "Anasthesiologist ⊑ ∃worksIn.OperatingRoom" ],
+  "hamming_yes" : 0.04040404040404044,
+  "entailed_no" : [ "Anasthesiologist ⊑ Doctor" ]
+}

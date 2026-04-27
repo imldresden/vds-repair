@@ -1,0 +1,156 @@
+[ {
+  "no" : 2,
+  "yes" : 1,
+  "axiomStr" : "SpicyIceCream ≡ (∃hasSpiciness.Hot ⊓ IceCream)",
+  "nodeId" : 0
+}, {
+  "no" : 4,
+  "yes" : 3,
+  "axiomStr" : "disjoint(PizzaBase, PizzaTopping, IceCream, Pizza)",
+  "nodeId" : 1
+}, {
+  "no" : 6,
+  "yes" : 5,
+  "axiomStr" : "disjoint(PizzaBase, PizzaTopping, IceCream, Pizza)",
+  "nodeId" : 2
+}, {
+  "no" : 8,
+  "yes" : 7,
+  "axiomStr" : "domain(hasTopping) = Pizza",
+  "nodeId" : 3
+}, {
+  "no" : 10,
+  "yes" : 9,
+  "axiomStr" : "domain(hasTopping) = Pizza",
+  "nodeId" : 4
+}, {
+  "no" : 12,
+  "yes" : 11,
+  "axiomStr" : "domain(hasTopping) = Pizza",
+  "nodeId" : 5
+}, {
+  "no" : 14,
+  "yes" : 13,
+  "axiomStr" : "domain(hasTopping) = Pizza",
+  "nodeId" : 6
+}, {
+  "no" : 16,
+  "yes" : 15,
+  "axiomStr" : "IceCream ⊑ ∃hasTopping.FruitTopping",
+  "nodeId" : 7
+}, {
+  "no" : 18,
+  "yes" : 17,
+  "axiomStr" : "IceCream ⊑ ∃hasTopping.FruitTopping",
+  "nodeId" : 8
+}, {
+  "no" : 20,
+  "yes" : 19,
+  "axiomStr" : "IceCream ⊑ ∃hasTopping.FruitTopping",
+  "nodeId" : 9
+}, {
+  "no" : 22,
+  "yes" : 21,
+  "axiomStr" : "IceCream ⊑ ∃hasTopping.FruitTopping",
+  "nodeId" : 10
+}, {
+  "no" : 24,
+  "yes" : 23,
+  "axiomStr" : "IceCream ⊑ ∃hasTopping.FruitTopping",
+  "nodeId" : 11
+}, {
+  "no" : 26,
+  "yes" : 25,
+  "axiomStr" : "IceCream ⊑ ∃hasTopping.FruitTopping",
+  "nodeId" : 12
+}, {
+  "no" : 28,
+  "yes" : 27,
+  "axiomStr" : "IceCream ⊑ ∃hasTopping.FruitTopping",
+  "nodeId" : 13
+}, {
+  "no" : 30,
+  "yes" : 29,
+  "axiomStr" : "IceCream ⊑ ∃hasTopping.FruitTopping",
+  "nodeId" : 14
+}, {
+  "no" : null,
+  "yes" : null,
+  "axiomStr" : null,
+  "nodeId" : 15
+}, {
+  "no" : null,
+  "yes" : null,
+  "axiomStr" : null,
+  "nodeId" : 16
+}, {
+  "no" : null,
+  "yes" : null,
+  "axiomStr" : null,
+  "nodeId" : 17
+}, {
+  "no" : null,
+  "yes" : null,
+  "axiomStr" : null,
+  "nodeId" : 18
+}, {
+  "no" : null,
+  "yes" : null,
+  "axiomStr" : null,
+  "nodeId" : 19
+}, {
+  "no" : null,
+  "yes" : null,
+  "axiomStr" : null,
+  "nodeId" : 20
+}, {
+  "no" : null,
+  "yes" : null,
+  "axiomStr" : null,
+  "nodeId" : 21
+}, {
+  "no" : null,
+  "yes" : null,
+  "axiomStr" : null,
+  "nodeId" : 22
+}, {
+  "no" : null,
+  "yes" : null,
+  "axiomStr" : null,
+  "nodeId" : 23
+}, {
+  "no" : null,
+  "yes" : null,
+  "axiomStr" : null,
+  "nodeId" : 24
+}, {
+  "no" : null,
+  "yes" : null,
+  "axiomStr" : null,
+  "nodeId" : 25
+}, {
+  "no" : null,
+  "yes" : null,
+  "axiomStr" : null,
+  "nodeId" : 26
+}, {
+  "no" : null,
+  "yes" : null,
+  "axiomStr" : null,
+  "nodeId" : 27
+}, {
+  "no" : null,
+  "yes" : null,
+  "axiomStr" : null,
+  "nodeId" : 28
+}, {
+  "no" : null,
+  "yes" : null,
+  "axiomStr" : null,
+  "nodeId" : 29
+}, {
+  "no" : null,
+  "yes" : null,
+  "axiomStr" : null,
+  "nodeId" : 30
+} ]

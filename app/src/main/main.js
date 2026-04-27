@@ -71,7 +71,7 @@ function setInfo(newInfo) {
   });
 }
 
-if (import.meta.env.VITE_HIDE_TODOS !== 'true') {
+if (import.meta.env.VITE_DEPLOY === 'true') {
   document.querySelectorAll('.to-do').forEach((el) => el.classList.remove('to-do'));
 }
 

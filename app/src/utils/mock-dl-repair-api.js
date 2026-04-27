@@ -29,7 +29,11 @@ export function getActiveOntologyExample() {
 }
 
 function getActiveOntologyBasePath() {
-  return `https://imldresden.github.io/vds-repair/${getActiveOntologyExample().folder}`;
+  if (import.meta.env.VITE_DEPLOY === 'true') {
+    return `https://imldresden.github.io/vds-repair/${getActiveOntologyExample().folder}`;
+  } else {
+    return `/${getActiveOntologyExample().folder}`;
+  }
 }
 
 async function fetchCachedJson(cache, cacheKey, url, errorMessage) {

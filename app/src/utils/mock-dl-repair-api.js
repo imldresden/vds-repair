@@ -29,7 +29,7 @@ export function getActiveOntologyExample() {
 }
 
 function getActiveOntologyBasePath() {
-  return `/${getActiveOntologyExample().folder}`;
+  return `https://imldresden.github.io/vds-repair/${getActiveOntologyExample().folder}`;
 }
 
 async function fetchCachedJson(cache, cacheKey, url, errorMessage) {

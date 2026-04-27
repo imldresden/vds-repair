@@ -11,5 +11,4 @@ How to run:
   - To deploy to Github Pages:
     - Set `VITE_DEPLOY` to `true` in `.env`
     - Run `npm run build`
-    - Find `.folder}` and add `https://imldresden.github.io/vds-repair/` to the return string in `./dist/index.html`.
     - Move the contents of `/dist` to the `deploy` branch, commit and push.

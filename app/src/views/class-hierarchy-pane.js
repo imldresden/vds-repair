@@ -458,17 +458,15 @@ export async function openClassHierarchyPane(sourceCy, nodeId) {
     await new Promise(resolve => requestAnimationFrame(resolve));
   }
 
-  if (!newPane) {
-    newPane = spawnPane(
-      {
-        spawner: sourcePaneId,
-        id: isFixedDlRepairLayout ? DL_REPAIR_CLASS_HIERARCHY_PANE_ID : `class-hierarchy-${nodeId}-${Date.now()}`,
-        newPanePosition: 'right',
-      },
-      [`class-hierarchy-${nodeId}`],
-      [nodeId],
-    );
-  }
+  newPane ||= spawnPane(
+    {
+      spawner: sourcePaneId,
+      id: isFixedDlRepairLayout ? DL_REPAIR_CLASS_HIERARCHY_PANE_ID : `class-hierarchy-${nodeId}-${Date.now()}`,
+      newPanePosition: 'right',
+    },
+    [`class-hierarchy-${nodeId}`],
+    [nodeId],
+  );
 
   if (!newPane) {
     console.error('Failed to create class hierarchy pane');
@@ -540,6 +538,36 @@ export async function openClassHierarchyPane(sourceCy, nodeId) {
 
   const bottomTooltipId = `class-hierarchy-bottom-tooltip-${newPane.id}`;
   let bottomTooltipVisible = false;
+  let bottomTooltipHoverTimer = null;
+  let hoveredBottomNode = null;
+
+  const clearBottomTooltipHoverTimer = () => {
+    if (bottomTooltipHoverTimer) {
+      window.clearTimeout(bottomTooltipHoverTimer);
+      bottomTooltipHoverTimer = null;
+    }
+  };
+
+  const showBottomTooltip = (node) => {
+    if (bottomTooltipVisible || !node?.nonempty?.()) {
+      return;
+    }
+
+    const tooltip = document.createElement('div');
+    tooltip.textContent = 'Bottom is a subset of everything.';
+    makeTippy(node, tooltip, bottomTooltipId);
+    bottomTooltipVisible = true;
+  };
+
+  const hideBottomTooltip = () => {
+    clearBottomTooltipHoverTimer();
+    if (!bottomTooltipVisible) {
+      return;
+    }
+
+    hideAllTippies();
+    bottomTooltipVisible = false;
+  };
 
   setPaneTitle(newPane, nodeTitle, runLayout);
 
@@ -614,10 +642,32 @@ export async function openClassHierarchyPane(sourceCy, nodeId) {
       return;
     }
 
-    const tooltip = document.createElement('div');
-    tooltip.textContent = 'Bottom is a subset of everything.';
-    makeTippy(node, tooltip, bottomTooltipId);
-    bottomTooltipVisible = true;
+    showBottomTooltip(node);
+  });
+
+  cy.on('mouseover', 'node', (event) => {
+    const node = event.target;
+    if (!isOntologyBottomLabel(node.data('label'))) {
+      return;
+    }
+
+    hoveredBottomNode = node;
+    clearBottomTooltipHoverTimer();
+    bottomTooltipHoverTimer = window.setTimeout(() => {
+      if (hoveredBottomNode === node) {
+        showBottomTooltip(node);
+      }
+    }, 2000);
+  });
+
+  cy.on('mouseout', 'node', (event) => {
+    const node = event.target;
+    if (hoveredBottomNode !== node) {
+      return;
+    }
+
+    hoveredBottomNode = null;
+    hideBottomTooltip();
   });
 
   cy.on('tap', (event) => {
@@ -627,15 +677,11 @@ export async function openClassHierarchyPane(sourceCy, nodeId) {
       return;
     }
 
-    hideAllTippies();
-    bottomTooltipVisible = false;
+    hideBottomTooltip();
   });
 
   cy.on('destroy', () => {
-    if (bottomTooltipVisible) {
-      hideAllTippies();
-      bottomTooltipVisible = false;
-    }
+    hideBottomTooltip();
   });
 
   cy.fit(undefined, 30);

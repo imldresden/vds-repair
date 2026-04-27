@@ -11,7 +11,6 @@ import { colorList } from '../../utils/utils.js';
 import { CONSTANTS } from '../../utils/names.js';
 import makeCtxMenu from './ctx-menu.js';
 import { BACKEND } from '../../main/main.js';
-import { socket } from '../imports/import-socket.js';
 
 const MIN_FLEX_GROW = 0.005;
 const MIN_SIZE = 10;
@@ -21,16 +20,6 @@ const tracker = {}; // keeps track of already seen nodes, marks, etc.
 
 let height;
 const maxheight = () => height - MIN_SIZE * 2;
-
-socket.on('overview node clicked', (data) => {
-  if (data) {
-    highlightPaneById(data);
-  }
-});
-
-socket.on('disconnect', () => {
-  location.reload();
-});
 
 // ============================================================================
 // Matrix Hover Cross-Pane Synchronization
@@ -221,16 +210,6 @@ function spawnPane({ spawner, id, newPanePosition }, nodesIds, spawnerNodes) {
     spawner,
     spawnerNodes,
   };
-
-  const newPane = {
-    backgroundColor: pane.backgroundColor,
-    id: pane.id,
-    nodesIds: pane.nodesIds,
-    spawner,
-    spawnerNodes,
-  };
-
-  socket.emit('pane added', newPane);
 
   pane.details = pane.container + '-details';
 
@@ -752,7 +731,6 @@ async function destroyPanes(firstId, {
 
     if (manualRemoval) {
       delete allPanesRegistry[firstId];
-      socket.emit('pane removed', firstId);
     } else if (allPanesRegistry[firstId]) {
       allPanesRegistry[firstId].destroyed = true;
     }
@@ -769,8 +747,6 @@ async function destroyPanes(firstId, {
 
       highlightPaneById(lastPaneId);
     }
-
-    socket.emit('pane removed', firstId);
 
     // trigger graph comparison update if enabled
     const checkbox = document.getElementById('checkbox-graph-comparison');

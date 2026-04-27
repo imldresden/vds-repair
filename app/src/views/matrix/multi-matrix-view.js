@@ -1,50 +1,10 @@
-/**
- * Multi-Matrix View Module
- *
- * Displays data from multiple panes in a single split matrix visualization.
- * The matrix is split by the diagonal:
- * - Lower triangle: Pane 1 data
- * - Upper triangle: Pane 2 data
- *
- * Features:
- * - Canvas-based rendering for performance
- * - Zoom and pan interactions
- * - Automatic layout based on container size
- * - Color coding to distinguish pane sources
- *
- * @module multi-matrix-view
- */
-
 import events from '../../utils/events.js';
 
-// ============================================================================
-// Constants
-// ============================================================================
-
-/** Zoom constraints */
 const ZOOM_MIN = 0.5;
 const ZOOM_MAX = 5;
 const ZOOM_FACTOR_IN = 1.1;
 const ZOOM_FACTOR_OUT = 0.9;
 
-/** Colors for different panes */
-const PANE_COLORS = [
-  { r: 76, g: 175, b: 80 },   // Green for pane 1
-  { r: 244, g: 67, b: 54 },   // Red for pane 2
-  { r: 63, g: 81, b: 181 },   // Indigo for pane 3
-  { r: 255, g: 152, b: 0 },   // Orange for pane 4
-];
-
-// ============================================================================
-// Main Export Function
-// ============================================================================
-
-/**
- * Create a multi-matrix view that combines data from multiple source panes.
- *
- * @param {Object} targetPane - The pane where the multi-matrix will be displayed
- * @param {Array<Object>} sourcePanes - Array of source panes to combine
- */
 export function createMultiMatrix(targetPane, sourcePanes) {
   const container = document.getElementById(targetPane.container);
   if (!container) return;
@@ -104,16 +64,6 @@ export function createMultiMatrix(targetPane, sourcePanes) {
   updateMultiMatrixLegend(targetPane, sourcePanes);
 }
 
-// ============================================================================
-// DOM Creation Helpers
-// ============================================================================
-
-/**
- * Create or retrieve the multi-matrix container element.
- * @param {Object} targetPane - The target pane object
- * @param {HTMLElement} container - The pane's container element
- * @returns {HTMLElement} The multi-matrix container
- */
 function createMultiMatrixContainer(targetPane, container) {
   let multiMatrixContainer = document.getElementById(`${targetPane.container}-multi-matrix`);
 
@@ -134,10 +84,6 @@ function createMultiMatrixContainer(targetPane, container) {
   return multiMatrixContainer;
 }
 
-/**
- * Create the canvas element for the multi-matrix.
- * @returns {HTMLCanvasElement} The canvas element
- */
 function createMultiMatrixCanvas() {
   const canvas = document.createElement('canvas');
   Object.assign(canvas.style, {
@@ -150,18 +96,6 @@ function createMultiMatrixCanvas() {
   return canvas;
 }
 
-// ============================================================================
-// Event Handlers
-// ============================================================================
-
-/**
- * Set up event handlers for zoom, pan, and resize.
- * @param {HTMLCanvasElement} canvas - The canvas element
- * @param {HTMLElement} container - The container element
- * @param {Object} viewState - The view state object
- * @param {Function} render - The render function
- * @returns {Function} Cleanup function
- */
 function setupMultiMatrixEventHandlers(canvas, container, viewState, render) {
   // Zoom with mouse wheel
   const handleWheel = (e) => {
@@ -223,7 +157,7 @@ function setupMultiMatrixEventHandlers(canvas, container, viewState, render) {
 
       // Check each matrix
       const matrixSpacing = 2;
-      for (let matrixIdx = 0; matrixIdx < numMatrices; matrixIdx++) {
+      for (let matrixIdx = 0; matrixIdx < numMatrices; matrixIdx += 1) {
         const offsetX = labelSpace + matrixIdx * (matrixSize + matrixSpacing);
 
         const relX = transformedX - offsetX;
@@ -312,17 +246,6 @@ function setupMultiMatrixEventHandlers(canvas, container, viewState, render) {
   };
 }
 
-// ============================================================================
-// Matrix Rendering
-// ============================================================================
-
-/**
- * Render the combined matrix from multiple source panes.
- *
- * @param {HTMLCanvasElement} canvas - The canvas element
- * @param {Array<Object>} sourcePanes - Array of source panes
- * @param {Object} viewState - View state object with zoomLevel, panX, panY, hoveredRow, hoveredCol
- */
 function renderCombinedMatrix(canvas, sourcePanes, viewState) {
   const {
     zoomLevel = 1.0, panX = 0, panY = 0, hoveredRow = -1, hoveredCol = -1,
@@ -378,7 +301,7 @@ function renderCombinedMatrix(canvas, sourcePanes, viewState) {
 
   // Build adjacency matrices for each pane (using the same node ordering)
   // For Petri nets: skip transition nodes and create direct state-to-state connections
-  const paneMatrices = sourcePanes.map((pane, paneIdx) => {
+  const paneMatrices = sourcePanes.map((pane) => {
     const counts = Array(n).fill(0).map(() => Array(n).fill(0));
 
     // For each state node, find all reachable states through transitions
@@ -399,7 +322,7 @@ function renderCombinedMatrix(canvas, sourcePanes, viewState) {
 
             if (tgtIdx !== -1) {
               // Found a state-transition-state path
-              counts[srcIdx][tgtIdx]++;
+              counts[srcIdx][tgtIdx] += 1;
             }
           });
         }
@@ -411,9 +334,9 @@ function renderCombinedMatrix(canvas, sourcePanes, viewState) {
 
   // Find max count across all panes for scaling
   let maxCount = 0;
-  paneMatrices.forEach((counts, idx) => {
-    for (let i = 0; i < n; i++) {
-      for (let j = 0; j < n; j++) {
+  paneMatrices.forEach((counts) => {
+    for (let i = 0; i < n; i += 1) {
+      for (let j = 0; j < n; j += 1) {
         if (counts[i][j] > maxCount) maxCount = counts[i][j];
       }
     }
@@ -471,7 +394,7 @@ function renderCombinedMatrix(canvas, sourcePanes, viewState) {
   const orangeColor = { r: 255, g: 127, b: 14 };   // Orange
 
   // Draw each matrix
-  for (let matrixIdx = 0; matrixIdx < numMatrices; matrixIdx++) {
+  for (let matrixIdx = 0; matrixIdx < numMatrices; matrixIdx += 1) {
     const pane0Idx = matrixIdx * 2;       // Lower triangle pane
     const pane1Idx = matrixIdx * 2 + 1;   // Upper triangle pane
 
@@ -481,8 +404,8 @@ function renderCombinedMatrix(canvas, sourcePanes, viewState) {
     const offsetX = labelSpace + matrixIdx * (matrixSize + matrixSpacing);
 
     // Draw the matrix cells
-    for (let r = 0; r < n; r++) {
-      for (let c = 0; c < n; c++) {
+    for (let r = 0; r < n; r += 1) {
+      for (let c = 0; c < n; c += 1) {
         const x = offsetX + c * cellSize;
         const y = offsetY + r * cellSize;
 
@@ -509,18 +432,15 @@ function renderCombinedMatrix(canvas, sourcePanes, viewState) {
           } else {
             color = { r: 255, g: 255, b: 255 };  // Empty cell - white
           }
-        } else {
-          // Upper triangle - always orange
-          if (paneMatrices[pane1Idx]) {
-            count = Math.max(paneMatrices[pane1Idx][r][c], paneMatrices[pane1Idx][c][r]);
-            if (count > 0) {
-              color = orangeColor;
-            } else {
-              color = { r: 255, g: 255, b: 255 };  // Empty cell - white
-            }
+        } else if (paneMatrices[pane1Idx]) {
+          count = Math.max(paneMatrices[pane1Idx][r][c], paneMatrices[pane1Idx][c][r]);
+          if (count > 0) {
+            color = orangeColor;
           } else {
             color = { r: 255, g: 255, b: 255 };  // Empty cell - white
           }
+        } else {
+          color = { r: 255, g: 255, b: 255 };  // Empty cell - white
         }
 
         // Scale intensity based on count
@@ -541,7 +461,7 @@ function renderCombinedMatrix(canvas, sourcePanes, viewState) {
     ctx.strokeStyle = '#000';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    for (let i = 0; i < n; i++) {
+    for (let i = 0; i < n; i += 1) {
       const x1 = offsetX + i * cellSize;
       const y1 = offsetY + i * cellSize;
       const x2 = x1 + cellSize;
@@ -604,7 +524,7 @@ function renderCombinedMatrix(canvas, sourcePanes, viewState) {
       ctx.lineWidth = 1;
       ctx.setLineDash([4, 4]);
 
-      for (let i = 0; i < n; i++) {
+      for (let i = 0; i < n; i += 1) {
         if (selectedIds.has(nodeIds[i])) {
           // Highlight row
           ctx.strokeRect(offsetX, offsetY + i * cellSize, matrixSize, cellSize);
@@ -627,7 +547,7 @@ function renderCombinedMatrix(canvas, sourcePanes, viewState) {
   const matrixSpacing = 2;
   const firstOffsetX = labelSpace;
   ctx.textAlign = 'right';
-  for (let r = 0; r < n; r++) {
+  for (let r = 0; r < n; r += 1) {
     const label = nodeIds[r].length > 12 ? nodeIds[r].slice(0, 12) + '…' : nodeIds[r];
     const x = firstOffsetX - 6;
     const y = offsetY + r * cellSize + Math.min(cellSize - 4, cellSize * 0.8);
@@ -636,9 +556,9 @@ function renderCombinedMatrix(canvas, sourcePanes, viewState) {
 
   // Column labels (bottom, rotated -90°) - draw for each matrix
   const offsetDown = Math.max(20, fontSize + 16);
-  for (let matrixIdx = 0; matrixIdx < numMatrices; matrixIdx++) {
+  for (let matrixIdx = 0; matrixIdx < numMatrices; matrixIdx += 1) {
     const columnOffsetX = labelSpace + matrixIdx * (matrixSize + matrixSpacing);
-    for (let c = 0; c < n; c++) {
+    for (let c = 0; c < n; c += 1) {
       const label = nodeIds[c].length > 12 ? nodeIds[c].slice(0, 12) + '…' : nodeIds[c];
       const x = columnOffsetX + c * cellSize + Math.min(cellSize - 2, Math.floor(cellSize * 0.6));
       const y = offsetY + matrixSize + offsetDown;
@@ -657,17 +577,6 @@ function renderCombinedMatrix(canvas, sourcePanes, viewState) {
   ctx.restore();
 }
 
-// ============================================================================
-// Sidebar Legend
-// ============================================================================
-
-/**
- * Update the sidebar legend for multi-matrix view.
- * Shows which panes are in each matrix half and the color coding.
- *
- * @param {Object} targetPane - The target pane object
- * @param {Array<Object>} sourcePanes - Array of source panes
- */
 function updateMultiMatrixLegend(targetPane, sourcePanes) {
   const infoBox = document.getElementById('info-box');
   if (!infoBox) return;
@@ -719,7 +628,7 @@ function updateMultiMatrixLegend(targetPane, sourcePanes) {
 
   // Group panes by matrix
   const numMatrices = Math.ceil(sourcePanes.length / 2);
-  for (let matrixIdx = 0; matrixIdx < numMatrices; matrixIdx++) {
+  for (let matrixIdx = 0; matrixIdx < numMatrices; matrixIdx += 1) {
     const pane0Idx = matrixIdx * 2;
     const pane1Idx = matrixIdx * 2 + 1;
 

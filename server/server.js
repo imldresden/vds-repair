@@ -20,7 +20,6 @@ function writeToFile(buffer, filePath) {
 
 app.use(cors());
 
-app.get('/message', (_, res) => res.send('Hello from express!'));
 app.post(
   '/create-dl-repair-project',
   upload.fields([

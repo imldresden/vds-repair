@@ -14,7 +14,6 @@ import {
   collapsePane,
   highlightPaneById,
 } from '../panes/panes.js';
-import { handleEditorSelection } from '../editor.js';
 import { fixed } from '../../utils/utils.js';
 import {
   makeTippy,
@@ -30,7 +29,6 @@ import { ndl_to_pcp } from '../format.js';
 import { CONSTANTS } from '../../utils/names.js';
 import events from '../../utils/events.js';
 import { cytoscape } from '../imports/import-cytoscape.js';
-import { socket } from '../imports/import-socket.js';
 
 const THROTTLE_DEBOUNCE_DELAY = 100;
 var iteration = 0;
@@ -1270,8 +1268,6 @@ function bindListeners(cy) {
   });
 
   cy.on('select unselect', (e) => {
-    handleEditorSelection(e, cy);
-
     // Emit matrix-selection event for cross-pane synchronization
     const target = e.target;
     if (target && target.isNode && target.isNode() && target.data('type') === 's') {
@@ -1818,14 +1814,7 @@ function markRecurringNodesById(markId, showInOverview = false) {
     if (duplicatePanes.size > 1) {
       recurringNodes[nodeId] = duplicatePanes;
     }
-    if (showInOverview && duplicatePanes.size > 1) {
-      socket.emit('duplicate pane ids', duplicatePanes);
-    }
   });
-}
-
-function resetPaneNodeMarkings() {
-  socket.emit('reset pane-node markings');
 }
 
 function mergePane(panesToMerge, cy, prevSpawners) {
@@ -2463,57 +2452,6 @@ function keyboardShortcuts(cy, e) {
     }
   }
 }
-
-socket.on('handle selection', (data) => {
-  if (data) {
-    switch (data) {
-      case 'merge':
-        handleMergePane();
-        break;
-      case 'delete':
-        handleDeletePane();
-        break;
-      case 'duplicate':
-        handleDuplicatePane();
-        break;
-      case 'expand':
-        handleExpandPane();
-        break;
-      case 'collapse':
-        handleCollapsePane();
-        break;
-      case 'export':
-        handleExportPane();
-        break;
-    }
-  }
-});
-
-socket.on('overview nodes selected', (data) => {
-  if (data) {
-    var selectedPanes = [];
-    var paneCy;
-    data.forEach((id) => {
-      const selectedPane = getPanes()[id];
-      if (selectedPane) {
-        paneCy = getPanes()[id].cy;
-        const data = {
-          nodes: Array.from(paneCy.elementMapper.nodes.values()),
-          edges: Array.from(paneCy.elementMapper.edges.values()),
-          info: info,
-          cyImport: paneCy.json(),
-          paneId: paneCy.paneId,
-          paneCy,
-        };
-        selectedPanes.push(data);
-      }
-    });
-    selectedPanesData = {
-      selectedPanes,
-      paneCy,
-    };
-  }
-});
 
 // cy.vars stores the settings of the application
 // that can be inherited (to next panes) or loaded

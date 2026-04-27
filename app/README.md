@@ -13,7 +13,3 @@ How to run:
     - Run `npm run build`
     - Text replace `/${PU().folder}` to `https://imldresden.github.io/vds-repair/${PU().folder}` in `./dist/index.html` 
     - Move the contents of `/dist` to the `deploy` branch, commit and push.
-
-Development: 
-- currently, only cross-tab communication (`socket.io`) needs a server (see `vite.config.ts`). 
-- the code is in `/src`, but the html is at `./` (see `index.html`).

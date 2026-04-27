@@ -11,7 +11,6 @@ import { params as _dagre } from '../views/graph/layout-options/dagre.js';
 import { params as _klay } from '../views/graph/layout-options/klay.js';
 import { params as _cola } from '../views/graph/layout-options/cola.js';
 import { CONSTANTS } from './names.js';
-import { handleEditorSelection } from '../views/editor.js';
 import {
   markRecurringNodes,
   setMaxIteration,
@@ -24,7 +23,6 @@ import {
   updateMatrixLegendInSidebar,
 } from '../views/matrix/matrix-view.js';
 import { ndl_to_pcp } from '../views/format.js';
-import { socket } from '../views/imports/import-socket.js';
 
 const $ = document.querySelector.bind(document);
 const $cy_config = $('#cy-config');
@@ -113,9 +111,6 @@ async function setPane(paneId, { make = false, force = false } = {}) {
 
     // Update sidebar legends for active pane
     updateSidebarLegends(pane);
-
-    socket.emit('active pane', paneId);
-    handleEditorSelection(undefined, pane.cy);
     return pane.cy;
   } else {
     console.error('Attempted to activate a non-existing pane.');
@@ -1053,12 +1048,6 @@ function updatePropsValues() {
   return update;
 }
 
-async function status() {
-  const data = await socket.emitWithAck('MC_STATUS', PROJECT);
-  console.log(data);
-  return data;
-}
-
 async function triggerModelCheckProperty(e, propType, props) {
   e.target.className = spinningIcon;
   props.forEach((p) => {
@@ -1073,12 +1062,6 @@ async function triggerModelCheckProperty(e, propType, props) {
     { method: 'GET' },
   );
 }
-
-socket.on('MC_STATUS', (status) => {
-  setInfo(status.info);
-  info.updating = true;
-  setPane(pane.id, { force: true });
-});
 
 async function clear() {
   const request = await fetch(`${BACKEND}/${PROJECT}/clear`, {

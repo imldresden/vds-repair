@@ -3,7 +3,6 @@ import { params } from '../views/graph/layout-options/klay.js';
 import { spawnGraph } from '../views/graph/node-link.js';
 import { PROJECT } from '../utils/controls.js';
 import { CONSTANTS } from '../utils/names.js';
-import { socket } from '../views/imports/import-socket.js';
 import { startDLRepairProject } from './dl-repair-mode.js';
 import {
   isMatrixEnabled,

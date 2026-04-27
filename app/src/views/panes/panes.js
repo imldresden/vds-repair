@@ -1068,7 +1068,7 @@ document
       html: `
         <div class="dl-repair-example-modal">
           <label class="dl-repair-example-option">
-            <input type="radio" name="ontology-example" value="hospital" ${currentExample === 'hospital' ? 'checked' : ''}>
+            <input style="display:none" type="radio" name="ontology-example" value="hospital" ${currentExample === 'hospital' ? 'checked' : ''}>
             <span class="dl-repair-example-icon"><i class="fa-solid fa-hospital"></i></span>
             <span class="dl-repair-example-text">
               <span class="dl-repair-example-title">Hospital Ontology</span>
@@ -1076,7 +1076,7 @@ document
             </span>
           </label>
           <label class="dl-repair-example-option">
-            <input type="radio" name="ontology-example" value="pizza" ${currentExample === 'pizza' ? 'checked' : ''}>
+            <input style="display:none" type="radio" name="ontology-example" value="pizza" ${currentExample === 'pizza' ? 'checked' : ''}>
             <span class="dl-repair-example-icon"><i class="fa-solid fa-pizza-slice"></i></span>
             <span class="dl-repair-example-text">
               <span class="dl-repair-example-title">Pizza Ontology</span>

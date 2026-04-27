@@ -512,6 +512,32 @@ export function createDecisionTree(container, treeData, fullTreeData) {
       detail: { nodeId, paneId: cy.paneId },
     }));
   };
+  let preserveSelectionOnCoreTap = false;
+  let allowCoreDeselect = false;
+  let suppressSelectionChange = false;
+  let coreTapSelectionIds = [];
+
+  const restoreCoreTapSelection = () => {
+    if (allowCoreDeselect || coreTapSelectionIds.length === 0) {
+      preserveSelectionOnCoreTap = false;
+      coreTapSelectionIds = [];
+      return;
+    }
+
+    suppressSelectionChange = true;
+    cy.batch(() => {
+      coreTapSelectionIds.forEach((id) => {
+        const node = cy.getElementById(id);
+        if (node.nonempty()) {
+          node.select();
+        }
+      });
+    });
+    suppressSelectionChange = false;
+    preserveSelectionOnCoreTap = false;
+    coreTapSelectionIds = [];
+    dispatchSelectionChange();
+  };
 
   cy.on('layoutstop', ()=> { // select first node asap, only once
     cy.$('node').select();
@@ -529,11 +555,20 @@ export function createDecisionTree(container, treeData, fullTreeData) {
 
   cy.on('select', 'node', () => {
     activeDecisionTreeCy = cy;
+    if (suppressSelectionChange) {
+      return;
+    }
     dispatchSelectionChange();
   });
 
   cy.on('unselect', 'node', () => {
     activeDecisionTreeCy = cy;
+    if (suppressSelectionChange) {
+      return;
+    }
+    if (preserveSelectionOnCoreTap && !allowCoreDeselect) {
+      return;
+    }
     dispatchSelectionChange();
   });
 
@@ -557,6 +592,33 @@ export function createDecisionTree(container, treeData, fullTreeData) {
     const node = event.target;
     const nodeId = node.data('nodeId');
     expandNode(cy, nodeId);
+  });
+
+  cy.on('tapstart', (event) => {
+    if (event.target !== cy) {
+      return;
+    }
+
+    activeDecisionTreeCy = cy;
+    allowCoreDeselect = false;
+    coreTapSelectionIds = cy.$('node:selected').map(node => node.id());
+    preserveSelectionOnCoreTap = coreTapSelectionIds.length > 0;
+  });
+
+  cy.on('dbltap', (event) => {
+    if (event.target !== cy) {
+      return;
+    }
+
+    activeDecisionTreeCy = cy;
+    allowCoreDeselect = true;
+    preserveSelectionOnCoreTap = false;
+    coreTapSelectionIds = [];
+    suppressSelectionChange = true;
+    cy.nodes().unselect();
+    suppressSelectionChange = false;
+    dispatchSelectionChange();
+    allowCoreDeselect = false;
   });
 
   const keyboardHandler = (e) => {
@@ -821,6 +883,9 @@ export function createDecisionTree(container, treeData, fullTreeData) {
 
   cy.on('tap', () => {
     setPane(cy.paneId);
+    if (preserveSelectionOnCoreTap) {
+      queueMicrotask(restoreCoreTapSelection);
+    }
   });
 
   if (cy.paneId) {

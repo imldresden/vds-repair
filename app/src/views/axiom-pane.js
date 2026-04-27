@@ -290,12 +290,66 @@ export function createAxiomPane(container, treeData, paneId) {
 
   cy.paneId = paneId;
   cy.scratch('_summaryUserInteracting', false);
+  let preserveSelectionOnCoreTap = false;
+  let allowCoreDeselect = false;
+  let suppressSelectionChange = false;
+  let coreTapSelectionIds = [];
+
+  const restoreCoreTapSelection = () => {
+    if (allowCoreDeselect || coreTapSelectionIds.length === 0) {
+      preserveSelectionOnCoreTap = false;
+      coreTapSelectionIds = [];
+      return;
+    }
+
+    suppressSelectionChange = true;
+    cy.batch(() => {
+      coreTapSelectionIds.forEach((id) => {
+        const node = cy.getElementById(id);
+        if (node.nonempty()) {
+          node.select();
+        }
+      });
+    });
+    suppressSelectionChange = false;
+    preserveSelectionOnCoreTap = false;
+    coreTapSelectionIds = [];
+  };
 
   bindSummaryKeyboardShortcuts();
 
-  cy.on('tap', () => {
+  cy.on('tapstart', (event) => {
+    if (event.target !== cy) {
+      return;
+    }
+
+    activeSummaryCy = cy;
+    allowCoreDeselect = false;
+    coreTapSelectionIds = cy.$('node:selected').map(node => node.id());
+    preserveSelectionOnCoreTap = coreTapSelectionIds.length > 0;
+  });
+
+  cy.on('tap', (event) => {
     activeSummaryCy = cy;
     setPane(paneId);
+    if (event.target === cy && preserveSelectionOnCoreTap) {
+      queueMicrotask(restoreCoreTapSelection);
+    }
+  });
+
+  cy.on('dbltap', (event) => {
+    if (event.target !== cy) {
+      return;
+    }
+
+    activeSummaryCy = cy;
+    allowCoreDeselect = true;
+    preserveSelectionOnCoreTap = false;
+    coreTapSelectionIds = [];
+    suppressSelectionChange = true;
+    cy.nodes().unselect();
+    suppressSelectionChange = false;
+    allowCoreDeselect = false;
   });
 
   cy.on('mousedown touchstart grab drag dragpan', () => {
@@ -309,6 +363,19 @@ export function createAxiomPane(container, treeData, paneId) {
 
   cy.on('select', 'node', () => {
     activeSummaryCy = cy;
+    if (suppressSelectionChange) {
+      return;
+    }
+  });
+
+  cy.on('unselect', 'node', () => {
+    activeSummaryCy = cy;
+    if (suppressSelectionChange) {
+      return;
+    }
+    if (preserveSelectionOnCoreTap && !allowCoreDeselect) {
+      return;
+    }
   });
 
   cy.on('destroy', () => {

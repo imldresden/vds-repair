@@ -601,6 +601,36 @@ function setupDLRepairSidebarResize() {
   sidebarResizeInitialized = true;
 }
 
+function closeDLRepairSidebarIfEmpty() {
+  const detailsContainer = document.getElementById('dl-repair-details');
+  const hasDetails = Boolean(detailsContainer?.textContent?.trim());
+  if (hasDetails) {
+    return;
+  }
+
+  document.body.classList.add('config-closed');
+  const configToggle = document.getElementById('config-toggle');
+  const configToggleIcon = configToggle?.querySelector('i');
+  configToggle?.classList.add('icon-inactive');
+  configToggleIcon?.classList.remove('fa-chevron-right');
+  configToggleIcon?.classList.add('fa-chevron-left');
+}
+
+function openDLRepairSidebarIfContent() {
+  const detailsContainer = document.getElementById('dl-repair-details');
+  const hasDetails = Boolean(detailsContainer?.textContent?.trim());
+  if (!hasDetails) {
+    return;
+  }
+
+  document.body.classList.remove('config-closed');
+  const configToggle = document.getElementById('config-toggle');
+  const configToggleIcon = configToggle?.querySelector('i');
+  configToggle?.classList.remove('icon-inactive');
+  configToggleIcon?.classList.remove('fa-chevron-left');
+  configToggleIcon?.classList.add('fa-chevron-right');
+}
+
 function normalizeAxiomText(axiomText) {
   return typeof axiomText === 'string' ? axiomText.replace(/\s+/g, ' ').trim() : '';
 }
@@ -834,6 +864,7 @@ function displayNodeDetails(html, nodeId, pane, hammingDistance = null) {
     detailsContainer.innerHTML = html;
     detailsContainer.__hammingDistanceData = hammingDistance;
     bindHammingRepairClickActions(detailsContainer, nodeId, pane);
+    openDLRepairSidebarIfContent();
     return;
   }
 
@@ -849,6 +880,7 @@ function displayNodeDetails(html, nodeId, pane, hammingDistance = null) {
   bindHammingRepairClickActions(newContainer, nodeId, pane);
 
   document.getElementById('config')?.appendChild(newContainer);
+  openDLRepairSidebarIfContent();
 }
 
 function showErrorMessage(message) {
@@ -1601,6 +1633,7 @@ async function startDLRepairProject() {
       if (nodeId === null || selectedNodeIds.length === 0) {
         displayNodeDetails('', nodeId, targetPane);
         await updateDecisionTreePCP(targetPane, []);
+        closeDLRepairSidebarIfEmpty();
         return;
       }
 

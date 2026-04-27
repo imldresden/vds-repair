@@ -1,0 +1,22 @@
+{
+  "no" : {
+    "disjoint(PizzaBase, PizzaTopping, IceCream, Pizza)" : 100.0,
+    "FruitTopping ⊑ PizzaTopping" : 100.0,
+    "SpicyIceCream ≡ (∃hasSpiciness.Hot ⊓ IceCream)" : 100.0,
+    "domain(hasTopping) = Pizza" : 0.0,
+    "IceCream ⊑ ∃hasTopping.FruitTopping" : 100.0,
+    "VegetarianTopping ⊑ PizzaTopping" : 100.0,
+    "domain(hasBase) = Pizza" : 100.0,
+    "Spiciness ≡ (Mild ⊔ Medium ⊔ Hot)" : 100.0
+  },
+  "yes" : {
+    "disjoint(PizzaBase, PizzaTopping, IceCream, Pizza)" : 100.0,
+    "FruitTopping ⊑ PizzaTopping" : 100.0,
+    "SpicyIceCream ≡ (∃hasSpiciness.Hot ⊓ IceCream)" : 100.0,
+    "domain(hasTopping) = Pizza" : 100.0,
+    "IceCream ⊑ ∃hasTopping.FruitTopping" : 0.0,
+    "VegetarianTopping ⊑ PizzaTopping" : 100.0,
+    "domain(hasBase) = Pizza" : 100.0,
+    "Spiciness ≡ (Mild ⊔ Medium ⊔ Hot)" : 100.0
+  }
+}

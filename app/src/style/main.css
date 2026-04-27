@@ -474,6 +474,78 @@ nav {
   }
 }
 
+.dl-repair-example-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+}
+
+.dl-repair-example-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid #d2d8df;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #4c5968;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.dl-repair-example-option input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: #2f5f8f;
+  flex: 0 0 auto;
+}
+
+.dl-repair-example-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #eef4fb;
+  color: #2f5f8f;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.dl-repair-example-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.dl-repair-example-title {
+  color: #233142;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.dl-repair-example-copy {
+  color: #6b7684;
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.dl-repair-example-option:hover {
+  background: #ffffff;
+  border-color: rgba(90, 122, 157, 0.55);
+  box-shadow: 0 3px 10px rgba(26, 39, 53, 0.08);
+}
+
+.dl-repair-example-option:has(input:checked) {
+  background: #f3f8fd;
+  border-color: rgba(47, 95, 143, 0.62);
+  box-shadow: 0 0 0 2px rgba(47, 95, 143, 0.12);
+}
+
 .to-do {
   display: none;
 }

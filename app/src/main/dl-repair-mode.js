@@ -1480,7 +1480,7 @@ async function startDLRepairProject() {
   try {
     const treeData = await dlRepairApi.initializeDecisionTree();
     if (document.getElementById('project-id')) {
-      document.getElementById('project-id').innerHTML = PROJECT;
+      document.getElementById('project-id').innerHTML = dlRepairApi.getActiveOntologyExample().label || PROJECT;
     }
     if (!treeData?.nodes?.length) {
       throw new Error('No decision tree data available');

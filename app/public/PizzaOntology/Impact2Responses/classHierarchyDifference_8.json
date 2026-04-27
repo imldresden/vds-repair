@@ -1,0 +1,10 @@
+{
+  "hierarchyDifference" : {
+    "removedEdges" : [ ],
+    "addedEdges" : [ ]
+  },
+  "initialHierarchy" : [ [ "Food", "PizzaTopping" ], [ "PizzaTopping", "FruitTopping" ], [ "⊤", "DomainThing" ], [ "PizzaTopping", "MeatTopping" ], [ "⊤", "⊥" ], [ "ValuePartition", "Spiciness" ], [ "DomainThing", "Food" ], [ "Food", "Pizza" ], [ "⊤", "ValuePartition" ], [ "PizzaTopping", "VegetarianTopping" ], [ "⊥", "CheesyVegetableTopping" ], [ "Spiciness", "Hot" ], [ "Food", "PizzaBase" ], [ "Food", "IceCream" ], [ "IceCream", "SpicyIceCream" ], [ "PizzaTopping", "SpicyPizzaTopping" ], [ "VegetarianTopping", "CheeseTopping" ], [ "Spiciness", "Medium" ], [ "Spiciness", "Mild" ], [ "PizzaTopping", "VegetableTopping" ] ],
+  "repairYes" : true,
+  "modifiedHierarchy" : [ [ "Food", "PizzaTopping" ], [ "PizzaTopping", "FruitTopping" ], [ "⊤", "DomainThing" ], [ "PizzaTopping", "MeatTopping" ], [ "⊤", "⊥" ], [ "ValuePartition", "Spiciness" ], [ "DomainThing", "Food" ], [ "Food", "Pizza" ], [ "⊤", "ValuePartition" ], [ "PizzaTopping", "VegetarianTopping" ], [ "⊥", "CheesyVegetableTopping" ], [ "Spiciness", "Hot" ], [ "Food", "PizzaBase" ], [ "Food", "IceCream" ], [ "IceCream", "SpicyIceCream" ], [ "PizzaTopping", "SpicyPizzaTopping" ], [ "VegetarianTopping", "CheeseTopping" ], [ "Spiciness", "Medium" ], [ "Spiciness", "Mild" ], [ "PizzaTopping", "VegetableTopping" ] ],
+  "repairNo" : true
+}

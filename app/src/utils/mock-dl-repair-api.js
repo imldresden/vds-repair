@@ -3,6 +3,17 @@ const decisionTreeData = {
   edges: [],
 };
 
+const ONTOLOGY_EXAMPLES = {
+  hospital: {
+    folder: 'HospitalOntology',
+    label: 'Hospital Ontology',
+  },
+  pizza: {
+    folder: 'PizzaOntology',
+    label: 'Pizza Ontology',
+  },
+};
+
 const nodeInfoCache = new Map();
 
 const impactCache = {
@@ -10,6 +21,16 @@ const impactCache = {
   classHierarchy: new Map(),
   hammingDistance: new Map(),
 };
+
+export function getActiveOntologyExample() {
+  const params = new URLSearchParams(window.location.search);
+  const exampleId = params.get('example') || 'hospital';
+  return ONTOLOGY_EXAMPLES[exampleId] || ONTOLOGY_EXAMPLES.hospital;
+}
+
+function getActiveOntologyBasePath() {
+  return `/${getActiveOntologyExample().folder}`;
+}
 
 async function fetchCachedJson(cache, cacheKey, url, errorMessage) {
   if (cache.has(cacheKey)) {
@@ -43,7 +64,7 @@ function linkChildNode(parentNodeId, childNodeId, edgeType) {
 
 export async function initializeDecisionTree() {
   try {
-    const treeResponse = await fetch('/API_outputs/DecisionTreeResponse/decision_tree.json');
+    const treeResponse = await fetch(`${getActiveOntologyBasePath()}/DecisionTreeResponse/decision_tree.json`);
     const treeNodes = await treeResponse.json();
 
     decisionTreeData.nodes = treeNodes.map(node => ({
@@ -71,26 +92,13 @@ export async function initializeDecisionTree() {
     throw error;
   }
 }
-export async function getNodeInfo(nodeId) {
-  try {
-    return await fetchCachedJson(
-      nodeInfoCache,
-      nodeId,
-      `/API_outputs/NodeInfoResponses/infoResponse_node_${nodeId}.json`,
-      `Failed to fetch node info for node ${nodeId}`,
-    );
-  } catch (error) {
-    console.error(`Error loading node info for node ${nodeId}:`, error);
-    return null;
-  }
-}
 
 export async function getImpactProbabilities(nodeId) {
   try {
     return await fetchCachedJson(
       impactCache.probabilities,
       nodeId,
-      `/API_outputs/Impact1Responses/probabilities_${nodeId}.json`,
+      `${getActiveOntologyBasePath()}/Impact1Responses/probabilities_${nodeId}.json`,
       `Failed to fetch probabilities for node ${nodeId}`,
     );
   } catch (error) {
@@ -103,7 +111,7 @@ export async function getClassHierarchyDifference(nodeId) {
     return await fetchCachedJson(
       impactCache.classHierarchy,
       nodeId,
-      `/API_outputs/Impact2Responses/classHierarchyDifference_${nodeId}.json`,
+      `${getActiveOntologyBasePath()}/Impact2Responses/classHierarchyDifference_${nodeId}.json`,
       `Failed to fetch class hierarchy for node ${nodeId}`,
     );
   } catch (error) {
@@ -116,7 +124,7 @@ export async function getHammingDistance(nodeId) {
     return await fetchCachedJson(
       impactCache.hammingDistance,
       nodeId,
-      `/API_outputs/Impact3Responses/hammingDistance_${nodeId}.json`,
+      `${getActiveOntologyBasePath()}/Impact3Responses/hammingDistance_${nodeId}.json`,
       `Failed to fetch hamming distance for node ${nodeId}`,
     );
   } catch (error) {
@@ -177,7 +185,6 @@ export function getParentNode(nodeId) {
 
 export default {
   initializeDecisionTree,
-  getNodeInfo,
   getImpactProbabilities,
   getClassHierarchyDifference,
   getHammingDistance,
@@ -186,4 +193,5 @@ export default {
   getNextNodes,
   getChildNodes,
   getParentNode,
+  getActiveOntologyExample,
 };

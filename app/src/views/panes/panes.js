@@ -1082,105 +1082,59 @@ document.getElementById('export-strat')?.addEventListener('click', () => {
 });
 
 document
-  .getElementById('new-project')
+  .getElementById('example-project')
   ?.addEventListener('click', async () => {
-    let redirectName;
+    const params = new URLSearchParams(window.location.search);
+    const currentExample = params.get('example') || 'hospital';
 
     await Swal.fire({
-      title: 'Create new project',
+      title: 'Choose an example project',
       html: `
-        <div style="text-align: left;">
-          <div id="dl-repair-inputs" style="display: block;">
-            <p style="margin-bottom: 10px;">Upload the required files for DL repair analysis.</p>
-            
-            <label style="float:left;margin-bottom:10px;margin-top:15px" for="ontology-file">Choose ontology file:</label>
-            <div class="ui file input">
-              <input id="ontology-file" type="file" accept=".owl, .rdf, .xml">
-            </div>
-
-            <div class="ui divider"></div>
-
-            <label style="float:left;margin-bottom:10px;margin-top:15px" for="interested-axioms-file">Choose interested axioms file:</label>
-            <div class="ui file input">
-              <input id="interested-axioms-file" type="file" accept=".owl, .rdf, .xml">
-            </div>
-
-            <div class="ui divider"></div>
-
-            <label style="float:left;margin-bottom:10px;margin-top:15px" for="defect-file">Choose defect file:</label>
-            <div class="ui file input">
-              <input id="defect-file" type="file" accept=".json, .txt, .xml">
-            </div>
-          </div>
-
-          <div class="ui divider"></div>
-
-          <label style="float:left;margin-bottom:10px;margin-top:15px;margin-right:50px">Project name (optional):</label>
-          <div style="float:left;" class="ui input">
-            <input id="project-name-unified" type="text" placeholder="Project name">
-          </div>
+        <div class="dl-repair-example-modal">
+          <label class="dl-repair-example-option">
+            <input type="radio" name="ontology-example" value="hospital" ${currentExample === 'hospital' ? 'checked' : ''}>
+            <span class="dl-repair-example-icon"><i class="fa-solid fa-hospital"></i></span>
+            <span class="dl-repair-example-text">
+              <span class="dl-repair-example-title">Hospital Ontology</span>
+              <span class="dl-repair-example-copy">Clinical domain repair example</span>
+            </span>
+          </label>
+          <label class="dl-repair-example-option">
+            <input type="radio" name="ontology-example" value="pizza" ${currentExample === 'pizza' ? 'checked' : ''}>
+            <span class="dl-repair-example-icon"><i class="fa-solid fa-pizza-slice"></i></span>
+            <span class="dl-repair-example-text">
+              <span class="dl-repair-example-title">Pizza Ontology</span>
+              <span class="dl-repair-example-copy">Food taxonomy repair example</span>
+            </span>
+          </label>
         </div>
       `,
       focusConfirm: false,
-      confirmButtonText: 'Create',
-      confirmButtonColor: 'green',
+      confirmButtonText: 'Load project',
+      confirmButtonColor: '#2f5f8f',
       preConfirm: () => {
-        Swal.showLoading();
-        const selectedMode = document.querySelector('input[name="project-mode"]:checked').value;
-        const nameInput = document.getElementById('project-name-unified');
-
-        const ontologyInput = document.getElementById('ontology-file');
-        const interestedAxiomsInput = document.getElementById('interested-axioms-file');
-        const defectInput = document.getElementById('defect-file');
-
-        if (!ontologyInput.value || !interestedAxiomsInput.value || !defectInput.value) {
-          Swal.hideLoading();
-          Swal.showValidationMessage('Please select all three required files');
-          return;
+        const selectedExample = document.querySelector('input[name="ontology-example"]:checked')?.value;
+        if (!selectedExample) {
+          Swal.showValidationMessage('Please choose an ontology example');
+          return false;
         }
-
-        const formData = new FormData();
-        formData.append('ontology_file', ontologyInput.files[0], ontologyInput.value);
-        formData.append('interested_axioms_file', interestedAxiomsInput.files[0], interestedAxiomsInput.value);
-        formData.append('defect_file', defectInput.files[0], defectInput.value);
-
-        const projectName = nameInput.value || shortid.generate();
-        redirectName = projectName;
-
-        return fetch(
-          `${BACKEND}/${projectName}/create-dl-repair-project`,
-          {
-            method: 'POST',
-            body: formData,
-          },
-        );
+        return selectedExample;
       },
-    }).then((response) => {
-      if (response.value) {
-        if (response.value.status === 200) {
-          Swal.fire({
-            title: 'Success!',
-            html: 'Redirecting to the created DL Repair project on a new tab.',
-            timer: 2000,
-            timerProgressBar: true,
-          }).then(() => {
-            window
-              .open(
-                window.location.href.split('?')[0] + '?id=' + redirectName,
-                '_blank',
-              )
-              .focus();
-          });
-        } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error Creating Project',
-            text: `Something went wrong! Received status ${response.status}. Please see the logs for more details`,
-          });
-        }
+    }).then((result) => {
+      if (!result.value) {
+        return;
       }
+
+      const nextParams = new URLSearchParams(window.location.search);
+      nextParams.set('example', result.value);
+      window.location.assign(`${window.location.pathname}?${nextParams.toString()}`);
     });
   });
+
+/*
+ * New project upload flow is temporarily disabled.
+ * The header now opens an example ontology chooser instead.
+ */
 
 export {
   enablePaneDragBars,

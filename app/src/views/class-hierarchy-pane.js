@@ -16,8 +16,45 @@ const EDGE_STATE = {
   ADDED: 'added',
   REMOVED: 'removed',
 };
+const CLASS_HIERARCHY_LAYOUT_MODE = {
+  HORIZONTAL: 'horizontal',
+  VERTICAL: 'vertical',
+};
 const CLASS_HIERARCHY_HEADER_HEIGHT = 32;
 const DL_REPAIR_CLASS_HIERARCHY_PANE_ID = 'class-hierarchy-pane-0';
+
+function getClassHierarchyLayoutOptions(
+  mode = CLASS_HIERARCHY_LAYOUT_MODE.HORIZONTAL,
+  { animate = true } = {},
+) {
+  return {
+    name: 'dagre',
+    rankDir: mode === CLASS_HIERARCHY_LAYOUT_MODE.HORIZONTAL ? 'RL' : 'BT',
+    nodeSep: 50,
+    rankSep: 90,
+    fit: true,
+    padding: 20,
+    animate,
+    animationDuration: 500,
+  };
+}
+
+function runClassHierarchyLayout(cy, mode = cy?.classHierarchyLayoutMode) {
+  if (!cy) {
+    return;
+  }
+
+  cy.classHierarchyLayout?.stop?.();
+  cy.classHierarchyLayoutMode = mode || CLASS_HIERARCHY_LAYOUT_MODE.HORIZONTAL;
+  const layout = cy.layout(getClassHierarchyLayoutOptions(cy.classHierarchyLayoutMode));
+  cy.classHierarchyLayout = layout;
+  layout.pon('layoutstop').then(() => {
+    if (cy.classHierarchyLayout === layout) {
+      cy.classHierarchyLayout = null;
+    }
+  });
+  layout.run();
+}
 
 function setDLRepairClassHierarchyVisibility(isVisible) {
   const layout = document.getElementById('dl-repair-layout');
@@ -509,31 +546,19 @@ export async function openClassHierarchyPane(sourceCy, nodeId) {
     container,
     elements,
     style: createComparisonStylesheet(),
-    layout: {
-      name: 'dagre',
-      rankDir: 'RL',
-      nodeSep: 50,
-      rankSep: 90,
-      fit: true,
-      padding: 20,
-      animate: false,
-    },
+    layout: getClassHierarchyLayoutOptions(
+      CLASS_HIERARCHY_LAYOUT_MODE.HORIZONTAL,
+      { animate: false },
+    ),
     minZoom: 0.2,
     maxZoom: 2.5,
     wheelSensitivity: 0.2,
   });
 
-  const runLayout = (mode = 'vertical') => {
-    const rankDir = mode === 'horizontal' ? 'RL' : 'BT';
-    cy.layout({
-      name: 'dagre',
-      rankDir,
-      nodeSep: 50,
-      rankSep: 90,
-      fit: true,
-      padding: 20,
-      animate: false,
-    }).run();
+  cy.classHierarchyLayoutMode = CLASS_HIERARCHY_LAYOUT_MODE.HORIZONTAL;
+
+  const runLayout = (mode = CLASS_HIERARCHY_LAYOUT_MODE.HORIZONTAL) => {
+    runClassHierarchyLayout(cy, mode);
   };
 
   const bottomTooltipId = `class-hierarchy-bottom-tooltip-${newPane.id}`;

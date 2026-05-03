@@ -116,7 +116,7 @@ nav {
 
 #config-toggle {
   position: absolute;
-  z-index: 5;
+  z-index: 150;
   top: calc(var(--nav-height) + 56px);
   cursor: pointer;
 
@@ -146,7 +146,7 @@ nav {
   width: 8px;
   margin-right: -4px;
   cursor: ew-resize;
-  z-index: 4;
+  z-index: 145;
 }
 
 #config-resizer::after {

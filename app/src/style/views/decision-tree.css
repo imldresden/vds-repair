@@ -324,7 +324,7 @@ body.dl-repair-layout-active #container {
   position: relative;
   background: #d2d8df;
   transition: background-color 0.15s ease;
-  z-index: 25;
+  z-index: 140;
 }
 
 .dl-repair-resizer:hover {
@@ -349,6 +349,7 @@ body.dl-repair-layout-active #container {
   position: absolute;
   top: 22%;
   left: 50%;
+  z-index: 150;
   width: 30px;
   height: 56px;
   transform: translate(-50%, -50%);
@@ -392,6 +393,24 @@ body.dl-repair-layout-active #container {
 
 .dl-repair-pane .pane-controls {
   display: none !important;
+}
+
+.dl-repair-pane.active-pane,
+.dl-repair-detached-details.active-pane {
+  border: 0;
+  box-shadow: 0 1px 3px rgba(26, 39, 53, 0.06);
+  position: relative;
+}
+
+.dl-repair-pane.active-pane::after,
+.dl-repair-detached-details.active-pane::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 3px solid var(--active-pane);
+  box-sizing: border-box;
+  pointer-events: none;
+  z-index: 120;
 }
 
 .dl-repair-fullscreen-toggle {

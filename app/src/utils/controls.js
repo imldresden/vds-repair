@@ -37,6 +37,7 @@ const params = new URLSearchParams(url.search);
 const PROJECT = params.get('id') || 'test';
 
 let pane = null;
+let activePaneRegion = 'pane';
 let tippies = {};
 let opened = {};
 
@@ -64,13 +65,14 @@ $('#config-toggle')?.addEventListener('click', () => {
 // panes and settings rely heavily on this function to work
 // this function is called by every interaction to ensure changes happen to the correct pane
 // therefore, be careful when introducing expensive operations here.
-async function setPane(paneId, { make = false, force = false } = {}) {
+async function setPane(paneId, { make = false, force = false, activeRegion = 'pane' } = {}) {
   const panes = getPanes();
 
   if (panes[paneId]) {
     if (pane && pane.id && panes[pane.id]) {
-      if (force || pane.id !== paneId) {
+      if (force || pane.id !== paneId || activePaneRegion !== activeRegion) {
         document.getElementById(pane.id).classList.remove('active-pane');
+        document.getElementById(pane.details)?.classList.remove('active-pane');
       } else {
         return; // nothing to change, avoid extra computations
       }
@@ -100,7 +102,9 @@ async function setPane(paneId, { make = false, force = false } = {}) {
       document.onkeydown = null;
     }
     document.getElementById('selected-pane').innerHTML = paneId;
-    document.getElementById(pane.id).classList.add('active-pane');
+    activePaneRegion = activeRegion;
+    const activeElementId = activeRegion === 'details' ? pane.details : pane.id;
+    document.getElementById(activeElementId)?.classList.add('active-pane');
     if (info.updating && pane.cy?.vars?.update?.fn) {
       await pane.cy.vars['update'].fn();
     }

@@ -119,7 +119,7 @@
   box-sizing: border-box;
 
   border: var(--active-pane) solid;
-  border-width: 5px 2px 5px 2px;
+  border-width: 3px;
 
   container-type: inline-size;
   container-name: active-pane;

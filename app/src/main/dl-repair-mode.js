@@ -11,7 +11,7 @@ import {
 } from '../views/axiom-pane.js';
 import { parallelCoords } from '../views/attributes/parallel-coords.js';
 import { DL_REPAIR_CLASS_HIERARCHY_PANE_ID, setDLRepairClassHierarchyVisibility } from '../views/class-hierarchy-pane.js';
-import { PROJECT } from '../utils/controls.js';
+import { PROJECT, setPane } from '../utils/controls.js';
 import dlRepairApi from '../utils/mock-dl-repair-api.js';
 
 const DL_REPAIR_SIDEBAR_WIDTH_KEY = 'dl-repair-sidebar-width';
@@ -1177,6 +1177,10 @@ async function updateDecisionTreePCP(pane, selectedNodeIds) {
     clearStarPlotView();
     const root = document.createElement('div');
     root.className = 'decision-tree-star-root';
+    root.addEventListener('mousedown', () => setPane(pane.id, {
+      activeRegion: 'details',
+      force: true,
+    }));
     detailElement.appendChild(root);
 
     const selectedKeys = (selectedIds || []).map(String).filter((id) => byNodeRows[id]);

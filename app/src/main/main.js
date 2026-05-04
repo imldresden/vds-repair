@@ -75,13 +75,23 @@ if (import.meta.env.VITE_DEPLOY === 'true') {
 }
 
 addEventListener('linked-selection', (e) => {
-  const selection = e.detail.selection;
+  const selection = e.detail.selection || [];
   const panes = getPanes();
-  panes[e.detail.pane].cy.nodes().unselect();
   const ids = Array.from(new Set(selection.map((n) => n.linkedId || n.id).filter(Boolean)));
+  const cy = panes[e.detail.pane]?.cy;
+  if (!cy) {
+    return;
+  }
+
+  if (cy.applyLinkedSelection) {
+    cy.applyLinkedSelection(ids, { preservePcp: true });
+    return;
+  }
+
+  cy.nodes().unselect();
   const strSelection = `#${ids.join(', #')}`;
   if (strSelection !== '#') {
-    panes[e.detail.pane].cy.$(strSelection).select();
+    cy.$(strSelection).select();
   }
 }, true);
 

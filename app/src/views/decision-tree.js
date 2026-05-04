@@ -492,18 +492,28 @@ export function createDecisionTree(container, treeData, fullTreeData) {
     }));
   };
 
-  const dispatchSelectionChange = () => {
+  const dispatchSelectionChange = (detail = {}) => {
     const selectedNodes = cy.$('node:selected');
     if (selectedNodes.length === 0) {
       document.dispatchEvent(new CustomEvent('decision-tree-node-selected', {
-        detail: { nodeId: null, selectedNodeIds: [], paneId: cy.paneId },
+        detail: {
+          nodeId: null,
+          selectedNodeIds: [],
+          paneId: cy.paneId,
+          ...detail,
+        },
       }));
       return;
     }
     const nodeId = selectedNodes[0].data('nodeId');
     const selectedNodeIds = selectedNodes.map(n => n.data('nodeId'));
     document.dispatchEvent(new CustomEvent('decision-tree-node-selected', {
-      detail: { nodeId, selectedNodeIds, paneId: cy.paneId },
+      detail: {
+        nodeId,
+        selectedNodeIds,
+        paneId: cy.paneId,
+        ...detail,
+      },
     }));
   };
 
@@ -571,6 +581,21 @@ export function createDecisionTree(container, treeData, fullTreeData) {
     }
     dispatchSelectionChange();
   });
+
+  cy.applyLinkedSelection = (ids = [], options = {}) => {
+    activeDecisionTreeCy = cy;
+    const selectedIds = Array.from(new Set(ids)).filter(Boolean);
+
+    suppressSelectionChange = true;
+    cy.batch(() => {
+      cy.nodes().unselect();
+      if (selectedIds.length > 0) {
+        cy.$(`#${selectedIds.join(', #')}`).select();
+      }
+    });
+    suppressSelectionChange = false;
+    dispatchSelectionChange(options);
+  };
 
   cy.on('mouseover', 'node', (event) => {
     activeDecisionTreeCy = cy;

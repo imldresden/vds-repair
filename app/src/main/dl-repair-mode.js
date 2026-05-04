@@ -601,21 +601,6 @@ function setupDLRepairSidebarResize() {
   sidebarResizeInitialized = true;
 }
 
-function closeDLRepairSidebarIfEmpty() {
-  const detailsContainer = document.getElementById('dl-repair-details');
-  const hasDetails = Boolean(detailsContainer?.textContent?.trim());
-  if (hasDetails) {
-    return;
-  }
-
-  document.body.classList.add('config-closed');
-  const configToggle = document.getElementById('config-toggle');
-  const configToggleIcon = configToggle?.querySelector('i');
-  configToggle?.classList.add('icon-inactive');
-  configToggleIcon?.classList.remove('fa-chevron-right');
-  configToggleIcon?.classList.add('fa-chevron-left');
-}
-
 function openDLRepairSidebarIfContent() {
   const detailsContainer = document.getElementById('dl-repair-details');
   const hasDetails = Boolean(detailsContainer?.textContent?.trim());
@@ -1632,12 +1617,14 @@ async function startDLRepairProject() {
       document.dispatchEvent(new CustomEvent('hamming-repair-preview-clear'));
       const nodeId = event.detail.nodeId;
       const selectedNodeIds = event.detail.selectedNodeIds || [];
+      const preservePcp = Boolean(event.detail.preservePcp);
       const panes = getPanes();
       const targetPane = panes[event.detail.paneId] || pane;
       if (nodeId === null || selectedNodeIds.length === 0) {
         displayNodeDetails('', nodeId, targetPane);
-        await updateDecisionTreePCP(targetPane, []);
-        closeDLRepairSidebarIfEmpty();
+        if (!preservePcp) {
+          await updateDecisionTreePCP(targetPane, []);
+        }
         return;
       }
 
@@ -1679,7 +1666,9 @@ async function startDLRepairProject() {
         displayNodeDetails('', nodeId, targetPane);
       }
 
-      await updateDecisionTreePCP(targetPane, selectedNodeIds);
+      if (!preservePcp) {
+        await updateDecisionTreePCP(targetPane, selectedNodeIds);
+      }
     });
 
     document.addEventListener('decision-tree-pane-ready', (event) => {

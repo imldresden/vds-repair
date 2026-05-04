@@ -1107,10 +1107,112 @@ document
     });
   });
 
-/*
- * New project upload flow is temporarily disabled.
- * The header now opens an example ontology chooser instead.
- */
+document
+  .getElementById('new-project')
+  ?.addEventListener('click', async () => {
+    if (import.meta.env.VITE_DEPLOY === 'true') {
+      return;
+    }
+
+    let redirectName;
+
+    await Swal.fire({
+      title: 'Create new project',
+      html: `
+        <div style="text-align: left;">
+          <div id="dl-repair-inputs" style="display: block;">
+            <p style="margin-bottom: 10px;">Upload the required files for DL repair analysis.</p>
+
+            <label style="float:left;margin-bottom:10px;margin-top:15px" for="ontology-file">Choose ontology file:</label>
+            <div class="ui file input">
+              <input id="ontology-file" type="file" accept=".owl, .rdf, .xml">
+            </div>
+
+            <div class="ui divider"></div>
+
+            <label style="float:left;margin-bottom:10px;margin-top:15px" for="interested-axioms-file">Choose interested axioms file:</label>
+            <div class="ui file input">
+              <input id="interested-axioms-file" type="file" accept=".owl, .rdf, .xml">
+            </div>
+
+            <div class="ui divider"></div>
+
+            <label style="float:left;margin-bottom:10px;margin-top:15px" for="defect-file">Choose defect file:</label>
+            <div class="ui file input">
+              <input id="defect-file" type="file" accept=".json, .txt, .xml">
+            </div>
+          </div>
+
+          <div class="ui divider"></div>
+
+          <label style="float:left;margin-bottom:10px;margin-top:15px;margin-right:50px">Project name (optional):</label>
+          <div style="float:left;" class="ui input">
+            <input id="project-name-unified" type="text" placeholder="Project name">
+          </div>
+        </div>
+      `,
+      focusConfirm: false,
+      confirmButtonText: 'Create',
+      confirmButtonColor: 'green',
+      preConfirm: () => {
+        Swal.showLoading();
+        const nameInput = document.getElementById('project-name-unified');
+
+        const ontologyInput = document.getElementById('ontology-file');
+        const interestedAxiomsInput = document.getElementById('interested-axioms-file');
+        const defectInput = document.getElementById('defect-file');
+
+        if (!ontologyInput.value || !interestedAxiomsInput.value || !defectInput.value) {
+          Swal.hideLoading();
+          Swal.showValidationMessage('Please select all three required files');
+          return false;
+        }
+
+        const formData = new FormData();
+        formData.append('ontology_file', ontologyInput.files[0], ontologyInput.value);
+        formData.append('interested_axioms_file', interestedAxiomsInput.files[0], interestedAxiomsInput.value);
+        formData.append('defect_file', defectInput.files[0], defectInput.value);
+
+        const projectName = nameInput.value || shortid.generate();
+        redirectName = projectName;
+
+        return fetch(
+          `${BACKEND}/${projectName}/create-dl-repair-project`,
+          {
+            method: 'POST',
+            body: formData,
+          },
+        );
+      },
+    }).then((response) => {
+      if (!response.value) {
+        return;
+      }
+
+      if (response.value.status === 200) {
+        Swal.fire({
+          title: 'Success!',
+          html: 'Redirecting to the created DL Repair project on a new tab.',
+          timer: 2000,
+          timerProgressBar: true,
+        }).then(() => {
+          window
+            .open(
+              `${window.location.href.split('?')[0]}?id=${redirectName}`,
+              '_blank',
+            )
+            .focus();
+        });
+        return;
+      }
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Error Creating Project',
+        text: `Something went wrong! Received status ${response.value.status}. Please see the logs for more details`,
+      });
+    });
+  });
 
 export {
   enablePaneDragBars,

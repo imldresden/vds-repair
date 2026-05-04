@@ -71,7 +71,11 @@ function setInfo(newInfo) {
 }
 
 if (import.meta.env.VITE_DEPLOY === 'true') {
-  document.querySelectorAll('.to-do').forEach((el) => el.classList.remove('to-do'));
+  document.querySelectorAll('.to-do').forEach((el) => {
+    el.setAttribute('aria-disabled', 'true');
+    el.setAttribute('tabindex', '-1');
+    el.style.display = 'none';
+  });
 }
 
 addEventListener('linked-selection', (e) => {

@@ -810,18 +810,6 @@ export function createDecisionTree(container, treeData, fullTreeData) {
           hasTrailingDivider: false,
         },
         {
-          id: 'expand-new',
-          content: `${CONSTANTS.INTERACTIONS.expand1.name} on New Pane`,
-          tooltipText: `${CONSTANTS.INTERACTIONS.expand1.description} on new pane\\t(Ctrl+Enter)`,
-          selector: 'node:selected',
-          onClickFunction: (event) => {
-            const node = event.target || event.cyTarget;
-            const nodeId = node.data('nodeId');
-            expandNodeInNewPane(cy, nodeId);
-          },
-          hasTrailingDivider: true,
-        },
-        {
           id: 'collapse-node',
           content: 'Collapse',
           tooltipText: 'Collapse subtree',
